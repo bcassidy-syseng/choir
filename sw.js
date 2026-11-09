@@ -2,8 +2,8 @@
  * App files: network first (a new version shows on the next open), with the
  * last copy kept for offline use. Commander art and fonts: cache first.
  * Calls to the Google Apps Script servers are POSTs and are never cached. */
-const APP_CACHE = 'choir-app-v1';
-const ART_CACHE = 'choir-art-v1';
+const APP_CACHE = 'choir-app-v2';
+const ART_CACHE = 'choir-art-v2';
 const APP_FILES = [
   './', './index.html', './choir.js', './privacy.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
   './grimoire/', './grimoire/index.html', './grimoire/engine.js',
