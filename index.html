@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a130b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Choir">
+<title>Choir</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ===== Card-back base =====
+   Shared by Commander Grimoire and the MagicCon planner so the two apps rhyme:
+   a mottled bronze frame, a rust oval with a lavender rim, parchment text.
+   The same block lives in both repositories; change one, copy it to the other.
+   Each app sets its own --accent (Grimoire: gold, MagicCon: electric blue). */
+:root {
+  --cb-frame: #1a130b; --cb-frame-2: #251b10; --cb-frame-3: #33261a;
+  --cb-line: #4d3a22; --cb-line-hi: #7a5c34;
+  --cb-parch: #f1e5cc; --cb-muted: #c4b08c;
+  --cb-oval: #8a4219; --cb-oval-hi: #b0592a; --cb-rim: #7d74d8; --cb-copper: #d5814a;
+  --cb-blue: #3f9ff2; --cb-blue-hi: #86ccff; --cb-on-blue: #04182c;
+  --cb-gold: #dcb462; --cb-gold-hi: #f2d38e; --cb-on-gold: #2a1d05;
+  --cb-serif: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --cb-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --cb-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .07 0 0 0 0 .03 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --cb-mottle: radial-gradient(42% 28% at 18% 12%, rgba(130, 98, 56, .20), transparent 70%), radial-gradient(36% 24% at 84% 34%, rgba(96, 70, 38, .22), transparent 70%),
+    radial-gradient(48% 30% at 28% 66%, rgba(118, 88, 50, .16), transparent 70%), radial-gradient(34% 22% at 78% 88%, rgba(70, 50, 26, .26), transparent 70%);
+}
+body {
+  background-color: var(--cb-frame);
+  background-image: var(--cb-mottle), var(--cb-grain);
+  background-attachment: fixed, fixed, fixed, fixed, scroll;
+}
+/* The sign-in screen is the back of the card: a framed panel with the rust oval */
+.cb-back {
+  position: relative; width: min(330px, 100%); aspect-ratio: 5 / 6; margin: 0 auto 22px; padding: 16px;
+  display: grid; border-radius: 20px;
+  background: var(--cb-mottle), var(--cb-grain), var(--cb-frame-2); border: 1px solid var(--cb-line-hi);
+  box-shadow: inset 0 0 0 7px var(--cb-frame-2), inset 0 0 0 8px var(--cb-line), 0 18px 44px rgba(0, 0, 0, .5);
+}
+.cb-oval {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 50%; padding: 10% 13%; text-align: center;
+  background: radial-gradient(ellipse at 50% 38%, var(--cb-oval-hi), var(--cb-oval) 72%);
+  box-shadow: 0 0 0 2px var(--cb-rim), inset 0 0 34px rgba(0, 0, 0, .38);
+}
+.cb-oval h1 { margin: 0; font: 34px/1.02 var(--cb-serif); color: var(--accent-hi); text-shadow: 0 2px 0 rgba(0, 0, 0, .55), 0 0 1px #000; }
+.cb-oval p { margin: 0; color: #f8ecd6; font: 15px/1.35 var(--cb-sans); text-shadow: 0 1px 0 rgba(0, 0, 0, .35); }
+/* ===== end card-back base ===== */
+
+:root { --accent: var(--cb-gold); --accent-hi: var(--cb-gold-hi); }
+* { box-sizing: border-box; }
+html { background: var(--cb-frame); }
+html, body { margin: 0; color: var(--cb-parch); }
+body { font: 16px/1.45 var(--cb-sans); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+a { color: var(--cb-gold-hi); }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--cb-gold-hi); outline-offset: 2px; border-radius: 6px; }
+main { max-width: 440px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 28px) 18px calc(env(safe-area-inset-bottom, 0px) + 32px); }
+.mark { font: 120px/0.8 var(--cb-serif); color: var(--cb-gold-hi); text-shadow: 0 3px 0 rgba(0, 0, 0, .55), 0 0 1px #000; margin-bottom: 6px; }
+h2 { font: 24px/1.2 var(--cb-serif); font-weight: 400; margin: 0 0 10px; padding-left: 10px; border-left: 3px solid var(--cb-copper); }
+p { margin: 0 0 12px; }
+.muted { color: var(--cb-muted); }
+.steps { margin: 0 0 14px; padding-left: 22px; }
+.steps li { margin: 6px 0; }
+code { font: 700 15px/1 var(--cb-sans); background: var(--cb-frame-3); border: 1px solid var(--cb-line); border-radius: 6px; padding: 2px 6px; }
+.codeform { display: flex; gap: 8px; margin: 8px 0 6px; }
+.codeform input {
+  flex: 1; min-width: 0; min-height: 50px; padding: 0 14px; border-radius: 12px;
+  background: var(--cb-frame); border: 1px solid var(--cb-line); font-size: 22px; letter-spacing: .12em; text-transform: uppercase;
+}
+.codeform input:focus { outline: none; border-color: var(--cb-gold); }
+.btn { min-height: 50px; padding: 0 18px; border-radius: 12px; border: 0; background: var(--cb-gold); color: var(--cb-on-gold); font-weight: 700; }
+.btn:disabled { opacity: .55; }
+.err { color: #f6b3a5; min-height: 1.4em; margin: 4px 0 12px; }
+.note { padding: 12px 14px; border-radius: 12px; background: var(--cb-frame-3); border: 1px solid var(--cb-line); margin: 0 0 18px; }
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.top h1 { font: 40px/1 var(--cb-serif); font-weight: 400; margin: 0; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--cb-gold-hi); font-weight: 700; cursor: pointer; }
+/* Sections are drawn like cards from a deck: the section's own emblem, then its name */
+.decks { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.deck {
+  display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 14px; border-radius: 18px;
+  text-decoration: none; color: var(--cb-parch);
+  background: var(--cb-mottle), var(--cb-grain), var(--cb-frame-2); border: 1px solid var(--cb-line-hi);
+  box-shadow: inset 0 0 0 5px var(--cb-frame-2), inset 0 0 0 6px var(--cb-line), 0 12px 28px rgba(0, 0, 0, .4);
+}
+.deck img { width: 100%; aspect-ratio: 1; border-radius: 12px; display: block; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); }
+.deck b { font: 22px/1.1 var(--cb-serif); font-weight: 400; }
+.deck small { color: var(--cb-muted); font-size: 14px; line-height: 1.35; }
+.deck.mc b { color: var(--cb-blue-hi); }
+.deck.gm b { color: var(--cb-gold-hi); }
+.deck:active { transform: translateY(1px); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main id="root"></main>
+<script src="choir.js"></script>
+<script>
+'use strict';
+/* The Commander Grimoire script hands out sign-ins (see 14_ChoirAuth.gs). */
+const GRIMOIRE_API = 'https://script.google.com/macros/s/AKfycbxpabKYmqwDc4P_EoUyalFAiFRrZiEejKQjS3N8hUQVbkbX-j_DsUwnc7JrfCj4Zn9iCg/exec';
+const CON_DAY = new Date('2027-02-26T09:00:00-05:00');
+const GRIMOIRE_ROUTES = /^#\/(home|standings|battles|decks|nights|player|deck|battle|night)(\/|$)/;
+const root = document.getElementById('root');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function cardBack(title, line) {
+  return '<div class="cb-back"><div class="cb-oval"><div class="mark" aria-hidden="true">C</div><h1>' + esc(title) + '</h1><p>' + esc(line) + '</p></div></div>';
+}
+
+function signInView(message) {
+  root.innerHTML = cardBack('Choir', 'Our group’s games, nights and trips.') +
+    (message ? '<p class="note" role="status">' + esc(message) + '</p>' : '') +
+    '<h2>Sign in with Discord</h2>' +
+    '<ol class="steps"><li>In our Discord server, type <code>/grimoire login</code>.</li>' +
+    '<li>Tap <b>Sign in</b> in the private reply, or type its code here.</li></ol>' +
+    '<form class="codeform" id="codeform" autocomplete="off"><label class="sr" for="code" hidden>Sign-in code</label>' +
+    '<input id="code" name="code" inputmode="text" autocapitalize="characters" spellcheck="false" maxlength="11" placeholder="K7QX-2MPA" aria-label="Sign-in code">' +
+    '<button class="btn" type="submit">Sign in</button></form>' +
+    '<p class="err" id="err" role="alert"></p>' +
+    '<p class="muted">You stay signed in for 90 days on this device.</p>' +
+    '<p class="muted">Still using a group passcode? Open <a href="grimoire/">Grimoire</a> or <a href="magiccon/">MagicCon</a>.</p>' +
+    '<p class="muted" style="font-size:14px"><a href="privacy.html">Privacy</a></p>';
+  document.getElementById('codeform').addEventListener('submit', e => {
+    e.preventDefault();
+    const code = document.getElementById('code').value.trim();
+    if (code) redeem(code, e.target.querySelector('button'));
+  });
+}
+
+async function redeem(code, button) {
+  const err = document.getElementById('err');
+  if (button) { button.disabled = true; button.textContent = 'Signing in…'; }
+  if (err) err.textContent = '';
+  let out;
+  try {
+    const res = await fetch(GRIMOIRE_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: 'appSignIn', args: { code } }), redirect: 'follow' });
+    out = await res.json();
+  } catch (e) {
+    out = { ok: false, error: 'Choir couldn’t reach the server. Check your signal and try again.' };
+  }
+  if (out.ok) {
+    CHOIR.signIn(out.data.token, out.data.name);
+    history.replaceState(null, '', location.pathname + '?switch');
+    hubView('Signed in' + (out.data.name ? ' as ' + out.data.name : '') + '.');
+    return;
+  }
+  if (!document.getElementById('codeform')) signInView(out.error);
+  else {
+    document.getElementById('err').textContent = out.error || 'That didn’t work. Try again.';
+    if (button) { button.disabled = false; button.textContent = 'Sign in'; }
+  }
+}
+
+function hubView(message) {
+  const days = Math.ceil((CON_DAY - Date.now()) / 86400000);
+  const con = days > 1 ? 'Feb 26–28, ' + days + ' days to go' : days >= -2 ? 'This weekend!' : 'Feb 26–28, 2027';
+  root.innerHTML =
+    '<div class="top"><h1>Choir</h1><button class="link-btn" id="signout">Sign out</button></div>' +
+    (message ? '<p class="note" role="status">' + esc(message) + '</p>' : (CHOIR.name() ? '<p class="muted">Signed in as ' + esc(CHOIR.name()) + '.</p>' : '')) +
+    '<nav class="decks" aria-label="Sections">' +
+    '<a class="deck gm" href="grimoire/"><img src="grimoire/icons/icon-192.png" alt=""><b>Grimoire</b><small>Battles, standings and game nights</small></a>' +
+    '<a class="deck mc" href="magiccon/"><img src="magiccon/icon-192.png" alt=""><b>MagicCon Detroit</b><small>' + esc(con) + '</small></a>' +
+    '</nav>';
+  root.insertAdjacentHTML('beforeend', '<p class="muted" style="font-size:14px;margin-top:22px"><a href="privacy.html">Privacy</a></p>');
+  document.getElementById('signout').onclick = () => CHOIR.signOut();
+}
+
+(function start() {
+  const hash = location.hash;
+  const signin = /^#\/signin\/([A-Za-z0-9-]{8,12})$/.exec(hash);
+  if (signin) {
+    root.innerHTML = cardBack('Choir', 'Signing you in…');
+    redeem(signin[1]);
+    return;
+  }
+  // Links from Discord (game nights, players) open the right Grimoire page.
+  if (GRIMOIRE_ROUTES.test(hash)) { location.replace('grimoire/' + hash); return; }
+  if (hash === '#signed-out') {
+    history.replaceState(null, '', location.pathname);
+    signInView('Your sign-in has expired. Type /grimoire login in Discord to sign in again.');
+    return;
+  }
+  if (!CHOIR.token()) { signInView(); return; }
+  // Opening the app goes straight back to the section used last; ?switch shows the choice.
+  const last = CHOIR.last();
+  if (!/[?&]switch\b/.test(location.search) && (last === 'grimoire' || last === 'magiccon')) { location.replace(last + '/'); return; }
+  hubView();
+})();
+
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

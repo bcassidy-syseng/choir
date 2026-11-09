@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Choir</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IM+Fell+English&display=swap" rel="stylesheet">
+<style>
+/* ===== Card-back base =====
+   Shared by Commander Grimoire and the MagicCon planner so the two apps rhyme:
+   a mottled bronze frame, a rust oval with a lavender rim, parchment text.
+   The same block lives in both repositories; change one, copy it to the other.
+   Each app sets its own --accent (Grimoire: gold, MagicCon: electric blue). */
+:root {
+  --cb-frame: #1a130b; --cb-frame-2: #251b10; --cb-frame-3: #33261a;
+  --cb-line: #4d3a22; --cb-line-hi: #7a5c34;
+  --cb-parch: #f1e5cc; --cb-muted: #c4b08c;
+  --cb-oval: #8a4219; --cb-oval-hi: #b0592a; --cb-rim: #7d74d8; --cb-copper: #d5814a;
+  --cb-blue: #3f9ff2; --cb-blue-hi: #86ccff; --cb-on-blue: #04182c;
+  --cb-gold: #dcb462; --cb-gold-hi: #f2d38e; --cb-on-gold: #2a1d05;
+  --cb-serif: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --cb-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --cb-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .07 0 0 0 0 .03 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --cb-mottle: radial-gradient(42% 28% at 18% 12%, rgba(130, 98, 56, .20), transparent 70%), radial-gradient(36% 24% at 84% 34%, rgba(96, 70, 38, .22), transparent 70%),
+    radial-gradient(48% 30% at 28% 66%, rgba(118, 88, 50, .16), transparent 70%), radial-gradient(34% 22% at 78% 88%, rgba(70, 50, 26, .26), transparent 70%);
+}
+body {
+  background-color: var(--cb-frame);
+  background-image: var(--cb-mottle), var(--cb-grain);
+  background-attachment: fixed, fixed, fixed, fixed, scroll;
+}
+/* The sign-in screen is the back of the card: a framed panel with the rust oval */
+.cb-back {
+  position: relative; width: min(330px, 100%); aspect-ratio: 5 / 6; margin: 0 auto 22px; padding: 16px;
+  display: grid; border-radius: 20px;
+  background: var(--cb-mottle), var(--cb-grain), var(--cb-frame-2); border: 1px solid var(--cb-line-hi);
+  box-shadow: inset 0 0 0 7px var(--cb-frame-2), inset 0 0 0 8px var(--cb-line), 0 18px 44px rgba(0, 0, 0, .5);
+}
+.cb-oval {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 50%; padding: 10% 13%; text-align: center;
+  background: radial-gradient(ellipse at 50% 38%, var(--cb-oval-hi), var(--cb-oval) 72%);
+  box-shadow: 0 0 0 2px var(--cb-rim), inset 0 0 34px rgba(0, 0, 0, .38);
+}
+.cb-oval h1 { margin: 0; font: 34px/1.02 var(--cb-serif); color: var(--accent-hi); text-shadow: 0 2px 0 rgba(0, 0, 0, .55), 0 0 1px #000; }
+.cb-oval p { margin: 0; color: #f8ecd6; font: 15px/1.35 var(--cb-sans); text-shadow: 0 1px 0 rgba(0, 0, 0, .35); }
+/* ===== end card-back base ===== */
+
+html { background: var(--cb-frame); }
+body { margin: 0; color: var(--cb-parch); font: 16px/1.55 var(--cb-sans); }
+main { max-width: 680px; margin: 0 auto; padding: 32px 18px 48px; }
+h1 { font: 40px/1.1 var(--cb-serif); font-weight: 400; margin: 0 0 6px; }
+h2 { font: 23px/1.2 var(--cb-serif); font-weight: 400; margin: 28px 0 8px; padding-left: 10px; border-left: 3px solid var(--cb-copper); }
+p, li { color: var(--cb-parch); }
+.muted { color: var(--cb-muted); }
+a { color: var(--cb-gold-hi); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-top: 1px solid var(--cb-line); }
+th { color: var(--cb-muted); font-weight: 400; }
+</style>
+</head>
+<body>
+<main>
+<h1>Privacy</h1>
+<p class="muted">Choir and the Commander Grimoire Discord bot. Last updated November 8, 2026.</p>
+
+<p>Choir is a private app for one group of friends who play Magic: The Gathering together. It is run by the group's organizer, not by a company. Nothing in it is sold, shared with advertisers, or used for anything except running the group's games, game nights and trips.</p>
+
+<h2>What is kept</h2>
+<table>
+<tr><th>What</th><th>Why</th></tr>
+<tr><td>Your Discord user ID, and the display name Discord shows when you sign in</td><td>To know it's you when you sign in, and to show your name</td></tr>
+<tr><td>Which Grimoire player and which MagicCon name you claimed</td><td>So only you can answer and make changes as yourself</td></tr>
+<tr><td>Game results from Playgroup.gg (players, decks, results, notes)</td><td>Standings, battle history and decks</td></tr>
+<tr><td>Game nights, RSVPs, battle stories, MagicCon picks, results, photos, reactions, comments and change requests</td><td>The features you use; a change log records who changed what</td></tr>
+<tr><td>A sign-in token on your device</td><td>Keeps you signed in for 90 days. Signing out deletes it</td></tr>
+</table>
+
+<h2>Where it is kept</h2>
+<p>In the organizer's Google Sheets and Google Drive (photos), which only the organizer can open. Discord commands pass through the organizer's Cloudflare Worker, which keeps nothing. Commander art and card details are loaded from Scryfall. The app's own pages are hosted on GitHub Pages.</p>
+
+<h2>Who can see it</h2>
+<p>Members of the group, through the app and the Discord server. A game night's address is shown only to its host and to people who said they're in, and is never posted to Discord.</p>
+
+<h2>Changing or removing your data</h2>
+<p>Ask the organizer in the group's Discord server. They can unlink your Discord account, release a claimed name, and remove your entries. Signing out of the app removes the sign-in token from that device.</p>
+
+<h2>If something goes wrong</h2>
+<p>If the organizer learns that data was exposed, they will tell the group in Discord, and tell Discord if their developer terms require it.</p>
+
+<p class="muted">Magic: The Gathering is property of Wizards of the Coast. Choir is unofficial Fan Content permitted under the Fan Content Policy and is not approved or endorsed by Wizards. Card data and images from Scryfall.</p>
+<p><a href="./">Back to Choir</a></p>
+</main>
+</body>
+</html>

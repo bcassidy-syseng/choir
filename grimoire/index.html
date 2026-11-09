@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a130b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Choir">
+<title>Grimoire · Choir</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ===== Card-back base =====
+   Shared by Commander Grimoire and the MagicCon planner so the two apps rhyme:
+   a mottled bronze frame, a rust oval with a lavender rim, parchment text.
+   The same block lives in both repositories; change one, copy it to the other.
+   Each app sets its own --accent (Grimoire: gold, MagicCon: electric blue). */
+:root {
+  --cb-frame: #1a130b; --cb-frame-2: #251b10; --cb-frame-3: #33261a;
+  --cb-line: #4d3a22; --cb-line-hi: #7a5c34;
+  --cb-parch: #f1e5cc; --cb-muted: #c4b08c;
+  --cb-oval: #8a4219; --cb-oval-hi: #b0592a; --cb-rim: #7d74d8; --cb-copper: #d5814a;
+  --cb-blue: #3f9ff2; --cb-blue-hi: #86ccff; --cb-on-blue: #04182c;
+  --cb-gold: #dcb462; --cb-gold-hi: #f2d38e; --cb-on-gold: #2a1d05;
+  --cb-serif: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --cb-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --cb-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .07 0 0 0 0 .03 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --cb-mottle: radial-gradient(42% 28% at 18% 12%, rgba(130, 98, 56, .20), transparent 70%), radial-gradient(36% 24% at 84% 34%, rgba(96, 70, 38, .22), transparent 70%),
+    radial-gradient(48% 30% at 28% 66%, rgba(118, 88, 50, .16), transparent 70%), radial-gradient(34% 22% at 78% 88%, rgba(70, 50, 26, .26), transparent 70%);
+}
+body {
+  background-color: var(--cb-frame);
+  background-image: var(--cb-mottle), var(--cb-grain);
+  background-attachment: fixed, fixed, fixed, fixed, scroll;
+}
+/* The sign-in screen is the back of the card: a framed panel with the rust oval */
+.cb-back {
+  position: relative; width: min(330px, 100%); aspect-ratio: 5 / 6; margin: 0 auto 22px; padding: 16px;
+  display: grid; border-radius: 20px;
+  background: var(--cb-mottle), var(--cb-grain), var(--cb-frame-2); border: 1px solid var(--cb-line-hi);
+  box-shadow: inset 0 0 0 7px var(--cb-frame-2), inset 0 0 0 8px var(--cb-line), 0 18px 44px rgba(0, 0, 0, .5);
+}
+.cb-oval {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 50%; padding: 10% 13%; text-align: center;
+  background: radial-gradient(ellipse at 50% 38%, var(--cb-oval-hi), var(--cb-oval) 72%);
+  box-shadow: 0 0 0 2px var(--cb-rim), inset 0 0 34px rgba(0, 0, 0, .38);
+}
+.cb-oval h1 { margin: 0; font: 34px/1.02 var(--cb-serif); color: var(--accent-hi); text-shadow: 0 2px 0 rgba(0, 0, 0, .55), 0 0 1px #000; }
+.cb-oval p { margin: 0; color: #f8ecd6; font: 15px/1.35 var(--cb-sans); text-shadow: 0 1px 0 rgba(0, 0, 0, .35); }
+/* ===== end card-back base ===== */
+:root {
+  --ink: var(--cb-frame);
+  --ink-2: var(--cb-frame-2);
+  --ink-3: var(--cb-frame-3);
+  --line: var(--cb-line);
+  --vellum: var(--cb-parch);
+  --ash: var(--cb-muted);
+  --gilt: var(--cb-gold);
+  --gilt-bright: var(--cb-gold-hi);
+  --on-gilt: var(--cb-on-gold);
+  --accent-hi: var(--cb-gold-hi);
+  --loss: #8a7a62;
+  --W: #efe2b4; --U: #4aa8e4; --B: #a3958a; --R: #e2563a; --G: #6fb041; --C: #9d927f;
+  --serif: var(--cb-serif);
+  --sans: var(--cb-sans);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabs-h: 64px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; color: var(--vellum); }
+html { background: var(--ink); }
+body {
+  font: 16px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
+  overscroll-behavior-y: none;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--gilt); }
+:focus-visible { outline: 2px solid var(--gilt-bright); outline-offset: 2px; border-radius: 6px; }
+img { display: block; }
+.num { font-variant-numeric: tabular-nums; }
+.serif { font-family: var(--serif); font-weight: 400; }
+.muted { color: var(--ash); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Frame ---------- */
+.top {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px;
+  background: rgba(26, 19, 11, .94); border-bottom: 1px solid var(--cb-line-hi);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.brand { display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 0; }
+.brand svg { width: 28px; height: 28px; }
+.brand span { font: 21px/1 var(--serif); }
+a.brand { color: var(--vellum); text-decoration: none; }
+.brand .swap { width: 16px; height: 16px; color: var(--ash); }
+.filter-pill {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  max-width: 58vw; padding: 7px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--ink-2); font-size: 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.filter-pill svg { flex: none; width: 14px; height: 14px; }
+@media (max-width: 400px) { .brand span { display: none; } }
+.me-btn { flex: none; border: 0; padding: 0; background: none; border-radius: 50%; }
+main { max-width: 760px; margin: 0 auto; padding: 4px 16px calc(var(--tabs-h) + var(--safe-bottom) + 28px); }
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  padding: 6px 4px calc(6px + var(--safe-bottom));
+  background: rgba(37, 27, 16, .96); border-top: 1px solid var(--line);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.tabs a {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 0; color: var(--ash); text-decoration: none; font-size: 12px; border-radius: 10px;
+}
+.tabs a svg { width: 24px; height: 24px; }
+.tabs a[aria-current="page"] { color: var(--gilt); }
+.tabs a .dot { position: absolute; }
+@media (min-width: 900px) {
+  .tabs { position: sticky; top: 58px; bottom: auto; max-width: 760px; margin: 0 auto; border: 1px solid var(--line); border-radius: 14px; }
+  main { padding-bottom: 60px; }
+}
+.offline {
+  margin: 0 0 12px; padding: 8px 12px; border-radius: 10px;
+  background: var(--ink-3); color: var(--ash); font-size: 14px;
+}
+
+/* ---------- Shared pieces ---------- */
+h1, h2, h3 { margin: 0; font-weight: 400; }
+.page-title { font: 34px/1.1 var(--serif); margin: 6px 0 4px; }
+.page-sub { margin: 0 0 18px; color: var(--ash); }
+.section { margin-top: 30px; }
+.section > h2 { font: 23px/1.2 var(--serif); margin-bottom: 10px; padding-left: 10px; border-left: 3px solid var(--cb-copper); display: flex; align-items: baseline; gap: 10px; }
+.section > h2 a { margin-left: auto; font: 15px var(--sans); text-decoration: none; }
+.panel { background: var(--ink-2); border: 1px solid var(--line); border-radius: 16px; box-shadow: inset 0 1px 0 rgba(255, 230, 190, .04); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 18px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--ink-3); font-weight: 700;
+}
+.btn { color: var(--vellum); text-decoration: none; }
+.btn.primary { background: var(--gilt); color: var(--on-gilt); border-color: var(--gilt); }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: .5; cursor: default; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--gilt); font-weight: 700; }
+.field { display: block; margin-bottom: 14px; }
+.field > span { display: block; margin-bottom: 6px; font-size: 14px; color: var(--ash); }
+.input {
+  width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px;
+  background: var(--ink); border: 1px solid var(--line); color: var(--vellum);
+}
+textarea.input { min-height: 96px; resize: vertical; }
+.input:focus { border-color: var(--gilt); outline: none; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  padding: 4px; gap: 4px; border-radius: 12px; background: var(--ink); border: 1px solid var(--line);
+}
+.seg button {
+  min-height: 40px; border: 0; border-radius: 9px; background: none; color: var(--ash); font-weight: 700;
+}
+.seg button[aria-pressed="true"] { background: var(--ink-3); color: var(--vellum); box-shadow: inset 0 0 0 1px var(--line); }
+.seg.rsvp button[aria-pressed="true"][data-v="in"] { background: var(--gilt); color: var(--on-gilt); box-shadow: none; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  min-height: 38px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--ink-2); color: var(--vellum);
+}
+.chip[aria-pressed="true"] { border-color: var(--gilt); background: rgba(220, 180, 98, .14); }
+.empty { padding: 28px 18px; text-align: center; color: var(--ash); }
+.empty .btn { margin-top: 14px; }
+
+/* Mana pips: filled circles, labeled for screen readers */
+.pips { display: inline-flex; gap: 3px; vertical-align: middle; }
+.pip { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); }
+.pip.W { background: var(--W); } .pip.U { background: var(--U); } .pip.B { background: var(--B); }
+.pip.R { background: var(--R); } .pip.G { background: var(--G); }
+.pip.C { background: var(--C); border-radius: 2px; transform: rotate(45deg) scale(.8); }
+
+/* Results: a win is a filled gilt dot, a loss an empty ring */
+.form { display: inline-flex; gap: 4px; align-items: center; }
+.form i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--loss); }
+.form i.w { background: var(--gilt); box-shadow: none; }
+
+/* Avatars: initials on the player's signature-deck color */
+.av {
+  flex: none; display: inline-grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  font: 15px/1 var(--serif); color: var(--ink);
+  background: var(--av, var(--ash));
+}
+.av.sm { width: 28px; height: 28px; font-size: 13px; }
+.av.lg { width: 56px; height: 56px; font-size: 22px; }
+
+/* Commander art with a color-identity fallback */
+.art {
+  position: relative; overflow: hidden; background-color: #251b10; container-type: size;
+  background-image:
+    radial-gradient(circle at 18% 12%, var(--a, #3b2b18) 0, transparent 62%),
+    radial-gradient(circle at 88% 92%, var(--b, #2a1f12) 0, transparent 58%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .025) 0 2px, transparent 2px 14px);
+}
+.art .mark {
+  position: absolute; right: 6%; bottom: -8%; font: 70cqh/1 var(--serif); color: rgba(241, 229, 204, .13);
+  pointer-events: none; user-select: none;
+}
+.art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.art.split img + img { left: 50%; width: 50%; }
+.art.split img:first-child { width: 50%; }
+.art .credit {
+  position: absolute; z-index: 1; top: 10px; right: 12px; max-width: 60%;
+  padding: 3px 9px; border-radius: 999px; background: rgba(26, 19, 11, .72); color: var(--vellum);
+  font: 12px/1.4 var(--sans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.art .credit:empty { display: none; }
+
+/* ---------- Home ---------- */
+.hero { position: relative; margin: 0 -16px; min-height: 380px; display: flex; align-items: flex-end; }
+.hero .art { position: absolute; inset: 0; }
+.hero .art::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(26, 19, 11, .1) 0%, rgba(26, 19, 11, .35) 40%, var(--ink) 96%);
+}
+.hero-body { position: relative; width: 100%; padding: 0 16px 6px; }
+.hero .rank { display: flex; align-items: baseline; gap: 10px; }
+.hero .rank b { font: 88px/0.85 var(--serif); color: var(--gilt); font-weight: 400; }
+.hero .rank span { color: var(--vellum); font-size: 15px; }
+.hero h1 { font: 44px/1.05 var(--serif); margin: 6px 0 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat b { display: block; font: 30px/1.1 var(--serif); font-weight: 400; }
+.stat span { font-size: 13px; color: var(--ash); }
+.stat .delta { font: 14px var(--sans); margin-left: 4px; }
+.delta.up { color: var(--G); } .delta.down { color: var(--R); }
+.hero .sig { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; color: var(--ash); }
+.hero .sig a { color: var(--vellum); text-decoration: none; font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero.reveal .art img { animation: settle 1.6s cubic-bezier(.2, .7, .2, 1) both; }
+  @keyframes settle { from { transform: scale(1.08); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+
+.night-card { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 16px; }
+.datebox {
+  width: 62px; text-align: center; padding: 8px 0 6px; border-radius: 12px;
+  background: var(--ink); border: 1px solid var(--line);
+}
+.datebox b { display: block; font: 30px/1 var(--serif); font-weight: 400; color: var(--gilt); }
+.datebox span { font-size: 13px; color: var(--ash); }
+.night-card h3 { font: 21px/1.2 var(--serif); }
+.night-card p { margin: 2px 0 0; color: var(--ash); font-size: 15px; }
+.night-card .seg { grid-column: 1 / -1; }
+.who { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ash); }
+.stack { display: inline-flex; }
+.stack .av { margin-left: -8px; box-shadow: 0 0 0 2px var(--ink-2); }
+.stack .av:first-child { margin-left: 0; }
+
+.insights { list-style: none; margin: 0; padding: 0; }
+.insights li + li { border-top: 1px solid var(--line); }
+.insights a, .insights div { display: flex; align-items: center; gap: 12px; padding: 13px 16px; color: var(--vellum); text-decoration: none; }
+.insights .glyph { flex: none; width: 36px; text-align: center; font: 26px/1 var(--serif); color: var(--gilt); }
+
+/* Lists of people and battles */
+.list { list-style: none; margin: 0; padding: 0; }
+.list > li + li { border-top: 1px solid var(--line); }
+.list a.row {
+  display: grid; align-items: center; gap: 12px; padding: 12px 16px;
+  color: var(--vellum); text-decoration: none;
+}
+.standing { grid-template-columns: 28px auto 1fr auto; }
+.standing .pos { font: 22px/1 var(--serif); color: var(--ash); text-align: center; }
+.standing .who-name { min-width: 0; }
+.standing .who-name b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.standing .who-name small { display: block; color: var(--ash); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.standing .rec { text-align: right; }
+.standing .rec b { display: block; }
+.standing .rec small { color: var(--ash); font-size: 13px; }
+.list li.me a.row { box-shadow: inset 3px 0 0 var(--gilt); background: rgba(220, 180, 98, .06); }
+
+.podium { display: grid; grid-template-columns: 1fr 1.15fr 1fr; align-items: end; gap: 10px; margin: 8px 0 18px; }
+.podium a { display: block; text-align: center; color: var(--vellum); text-decoration: none; }
+.podium .art { margin: 0 auto 8px; border-radius: 50%; aspect-ratio: 1; box-shadow: 0 0 0 3px var(--line); }
+.podium .p1 .art { width: 100%; box-shadow: 0 0 0 3px var(--gilt); }
+.podium .p2 .art, .podium .p3 .art { width: 84%; }
+.podium .place { font: 30px/1 var(--serif); color: var(--gilt); }
+.podium b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podium small { color: var(--ash); }
+
+.battle { grid-template-columns: 52px 1fr auto; }
+.battle .art { width: 52px; height: 52px; border-radius: 12px; }
+.battle b { display: block; }
+.battle small { display: block; color: var(--ash); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.battle .when { text-align: right; font-size: 13px; color: var(--ash); }
+.month { margin: 22px 0 8px; font: 19px var(--serif); color: var(--ash); }
+
+/* Decks */
+.deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.deck-tile { display: block; color: var(--vellum); text-decoration: none; border-radius: 14px; overflow: hidden; background: var(--ink-2); border: 1px solid var(--line); }
+.deck-tile .art { aspect-ratio: 4 / 3; }
+.deck-tile .body { padding: 10px 12px 12px; }
+.deck-tile b { display: block; line-height: 1.25; }
+.deck-tile small { color: var(--ash); font-size: 13px; }
+.bar { height: 4px; border-radius: 4px; background: var(--ink); margin-top: 8px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--gilt); }
+.mana-filter { display: flex; gap: 8px; margin: 12px 0; }
+.mana-filter button {
+  width: 42px; height: 42px; border-radius: 50%; border: 2px solid transparent; padding: 0;
+  display: grid; place-items: center; background: var(--ink-2);
+}
+.mana-filter button .pip { width: 22px; height: 22px; }
+.mana-filter button[aria-pressed="true"] { border-color: var(--gilt); }
+
+/* Detail pages */
+.detail-hero { position: relative; margin: 0 -16px; min-height: 300px; display: flex; align-items: flex-end; }
+.detail-hero .art { position: absolute; inset: 0; }
+.detail-hero .art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(26, 19, 11, .05), rgba(26, 19, 11, .4) 45%, var(--ink) 97%); }
+.detail-hero .hero-body { position: relative; padding: 0 16px 4px; width: 100%; }
+.detail-hero h1 { font: 38px/1.08 var(--serif); }
+.detail-hero p { margin: 6px 0 0; color: var(--ash); }
+.back { position: absolute; z-index: 2; top: 8px; left: 12px; }
+.back a { display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px 7px 8px; border-radius: 999px; background: rgba(26, 19, 11, .72); color: var(--vellum); text-decoration: none; font-size: 15px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1px; background: var(--line); border-radius: 14px; overflow: hidden; border: 1px solid var(--line); margin-top: 18px; }
+.facts div { background: var(--ink-2); padding: 12px 14px; }
+.facts b { display: block; font: 26px/1.1 var(--serif); font-weight: 400; }
+.facts span { font-size: 13px; color: var(--ash); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.links a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--vellum); text-decoration: none; font-size: 15px; }
+.seat { grid-template-columns: auto 1fr auto; }
+.seat .res { font: 17px var(--serif); }
+.seat .res.w { color: var(--gilt); }
+.seat small { display: block; color: var(--ash); font-size: 13px; }
+.story { padding: 16px; }
+.story + .story { border-top: 1px solid var(--line); }
+.story p { margin: 0 0 6px; font: 19px/1.4 var(--serif); }
+.story small { color: var(--ash); }
+.chart { width: 100%; height: 150px; display: block; }
+table.h2h { width: 100%; border-collapse: collapse; }
+table.h2h th { text-align: left; font-weight: 400; color: var(--ash); font-size: 13px; padding: 10px 16px 6px; }
+table.h2h td { padding: 10px 16px; border-top: 1px solid var(--line); }
+table.h2h td.n { text-align: right; font-variant-numeric: tabular-nums; }
+table.h2h a { color: var(--vellum); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.pod-table { padding: 14px 16px; }
+.pod-table + .pod-table { border-top: 1px solid var(--line); }
+.pod-table h3 { font: 19px var(--serif); margin-bottom: 8px; color: var(--gilt); }
+.people { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.people a { display: flex; align-items: center; gap: 8px; color: var(--vellum); text-decoration: none; }
+
+/* Sheets and toasts */
+.scrim { position: fixed; inset: 0; z-index: 50; background: rgba(10, 7, 3, .66); display: none; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; max-height: 88vh; overflow: auto;
+  max-width: 640px; margin: 0 auto; padding: 10px 18px calc(18px + var(--safe-bottom));
+  background: var(--ink-2); border: 1px solid var(--line); border-bottom: 0; border-radius: 20px 20px 0 0;
+  transform: translateY(105%); transition: transform .24s ease; visibility: hidden;
+}
+.sheet.open { transform: none; visibility: visible; }
+.scrim.open { display: block; }
+.sheet .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 0 auto 14px; }
+.sheet h2 { font: 26px/1.2 var(--serif); margin-bottom: 14px; }
+.sheet h3 { font-size: 14px; color: var(--ash); margin: 16px 0 8px; font-weight: 400; }
+@media (prefers-reduced-motion: reduce) { .sheet { transition: none; } }
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--tabs-h) + var(--safe-bottom) + 14px); z-index: 70;
+  transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  max-width: calc(100vw - 32px); padding: 12px 16px; border-radius: 12px;
+  background: var(--vellum); color: var(--ink); font-weight: 700; transition: .2s ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Sign-in */
+.gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; text-align: center; }
+.gate .sigil { width: 96px; height: 96px; margin: 0 auto 4px; }
+.gate .cb-oval h1 { font-size: 34px; }
+.gate .cb-oval p { color: #f8ecd6; margin: 0; max-width: none; }
+.gate .cb-oval .sigil { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .5)); }
+.gate h1 { font: 42px/1.05 var(--serif); }
+.gate p { color: var(--ash); max-width: 30ch; margin: 10px auto 24px; }
+.gate form { width: min(360px, 100%); margin: 0 auto; text-align: left; }
+.pick { list-style: none; margin: 14px 0 0; padding: 0; text-align: left; width: min(420px, 100%); }
+.pick button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; }
+.pick button small { color: var(--ash); display: block; font-size: 13px; }
+.demo-note { align-self: center; padding: 2px 8px; border-radius: 6px; background: var(--gilt); color: var(--on-gilt); font: 700 11px/1.4 var(--sans); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="engine.js"></script>
+<script src="../choir.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+ * Commander Grimoire player app
+ * Set API_URL to your Apps Script web-app address (…/exec). Leave it
+ * empty, or open the page with ?demo, to explore with made-up data.
+ * ===================================================================== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbxpabKYmqwDc4P_EoUyalFAiFRrZiEejKQjS3N8hUQVbkbX-j_DsUwnc7JrfCj4Zn9iCg/exec';
+const APP_VERSION = '1.0.0';
+const PLAYGROUP_URL = 'https://playgroup.gg';
+const DEMO = !API_URL || new URLSearchParams(location.search).has('demo');
+
+/* ---------------- Storage ---------------- */
+const PREFIX = DEMO ? 'cgdemo_' : 'cg_';
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem(PREFIX + key); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
+  set(key, value) { try { localStorage.setItem(PREFIX + key, JSON.stringify(value)); } catch (e) { /* storage full or blocked: the app still works this session */ } },
+  del(key) { try { localStorage.removeItem(PREFIX + key); } catch (e) {} }
+};
+
+/* ---------------- State ---------------- */
+const S = {
+  pass: store.get('pass', DEMO ? 'demo' : ''),
+  me: store.get('me', ''),
+  data: store.get('data', null),
+  live: store.get('live', { nights: [], rsvps: [], stories: [] }),
+  filter: store.get('filter', { season: 'all', group: 'all' }),
+  ui: store.get('ui', { sort: 'wins', deckSort: 'wins', colors: [], mine: false }),
+  outbox: store.get('outbox', []),
+  syncedAt: store.get('syncedAt', 0),
+  offline: false,
+  server: store.get('server', ''),
+  gate: ''
+};
+let STATS = null;
+let STATS_KEY = '';
+/* Choir sign-in (../choir.js): with a Discord sign-in token the server decides who
+   you are; the group passcode is the fallback while it's still switched on. */
+const TOKEN = () => (!DEMO && window.CHOIR) ? CHOIR.token() : '';
+const authed = () => Boolean(S.pass || TOKEN());
+if (window.CHOIR && !DEMO) CHOIR.remember('grimoire');
+
+/* ---------------- Helpers ---------------- */
+const $ = sel => document.querySelector(sel);
+const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const enc = encodeURIComponent;
+const pct = v => (v == null ? '–' : Math.round(v * 100) + '%');
+const one = v => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed(1));
+const ordinal = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
+const plural = (n, word, many) => n + ' ' + (n === 1 ? word : (many || word + 's'));
+const COLOR_NAMES = { W: 'White', U: 'Blue', B: 'Black', R: 'Red', G: 'Green', C: 'Colorless' };
+const MANA_HEX = { W: '#efe2b4', U: '#4aa8e4', B: '#a3958a', R: '#e2563a', G: '#6fb041', C: '#9d927f' };
+
+function uid(prefix) {
+  const bytes = new Uint8Array(8);
+  (window.crypto || {}).getRandomValues ? crypto.getRandomValues(bytes) : bytes.forEach((_, i) => { bytes[i] = Math.random() * 256; });
+  return prefix + Array.from(bytes, b => (b % 36).toString(36)).join('');
+}
+
+function dayDate(dateKey) { return new Date(dateKey + 'T12:00:00'); }
+function fmtDay(dateKey, opts) { return dayDate(dateKey).toLocaleDateString(undefined, opts || { weekday: 'short', month: 'short', day: 'numeric' }); }
+function ago(t) {
+  const days = Math.round((Date.now() - t) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 14) return days + ' days ago';
+  if (days < 60) return Math.round(days / 7) + ' weeks ago';
+  return Math.round(days / 30) + ' months ago';
+}
+function turnTime(seconds) {
+  if (seconds == null) return '–';
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+/* ---------------- Data lookups ---------------- */
+const D = () => S.data;
+let NAME_MEMO = { v: '', list: [] };
+/** Players with the same name (usually a guest in each group) get their group added. */
+function displayNames() {
+  if (NAME_MEMO.v === D().v) return NAME_MEMO.list;
+  const count = {};
+  D().players.forEach(p => { count[p.n] = (count[p.n] || 0) + 1; });
+  NAME_MEMO = { v: D().v, list: D().players.map(p => {
+    if (count[p.n] < 2) return p;
+    const m = /^guest:([^:]+):/.exec(p.k);
+    const g = m ? D().groups.find(x => String(x.id) === m[1]) : null;
+    return Object.assign({}, p, { n: p.n + (g ? ' (' + g.n + ')' : '') });
+  }) };
+  return NAME_MEMO.list;
+}
+const player = i => displayNames()[i] || { k: '', n: 'Unknown player' };
+const deck = i => D().decks[i] || { n: 'Unknown deck', ci: '', cmd: [] };
+const playerIndex = key => D() ? D().players.findIndex(p => p.k === key) : -1;
+const deckIndexByKey = key => D().decks.findIndex(d => d.k === key);
+const groupName = g => (D().groups[g] || {}).n || 'Unknown group';
+const meIndex = () => playerIndex(S.me);
+
+function stats() {
+  const key = S.data.v + '|' + S.filter.season + '|' + S.filter.group;
+  if (key !== STATS_KEY) {
+    STATS = Engine.compute(S.data, Engine.filterGames(S.data, S.filter));
+    STATS_KEY = key;
+  }
+  return STATS;
+}
+function allTime() { return Engine.compute(S.data, S.data.games); }
+
+function filterLabel() {
+  const season = (Engine.seasons(S.data).find(s => s.id === S.filter.season) || { label: 'All time' }).label;
+  const group = S.filter.group === 'all' ? 'all groups' : groupName(+S.filter.group);
+  return season + ', ' + group;
+}
+
+/* ---------------- Visual atoms ---------------- */
+function pips(ci) {
+  const colors = String(ci || '').split('').filter(c => 'WUBRG'.indexOf(c) >= 0);
+  const list = colors.length ? colors : ['C'];
+  const label = list.map(c => COLOR_NAMES[c]).join(', ');
+  return '<span class="pips" role="img" aria-label="' + esc(label) + '">' + list.map(c => '<i class="pip ' + c + '"></i>').join('') + '</span>';
+}
+
+function artUrl(d, which) {
+  const direct = which === 2 ? d.art2 : d.art;
+  if (direct) return direct;
+  const name = (d.cmd || [])[which === 2 ? 1 : 0];
+  return name ? 'https://api.scryfall.com/cards/named?exact=' + enc(name) + '&format=image&version=art_crop' : '';
+}
+
+function artStyle(ci) {
+  const colors = String(ci || '').split('').filter(c => MANA_HEX[c]);
+  const a = colors[0] ? MANA_HEX[colors[0]] : '#3b2b18';
+  const b = colors[1] ? MANA_HEX[colors[1]] : '#2a1f12';
+  return '--a:' + a + '8c;--b:' + b + '66';
+}
+
+function art(deckIdx, extraClass, opts) {
+  if (deckIdx == null || deckIdx < 0) return '<div class="art ' + (extraClass || '') + '"></div>';
+  const d = deck(deckIdx);
+  const first = artUrl(d, 1);
+  const second = (opts && opts.pair) ? artUrl(d, 2) : '';
+  const img = url => url ? '<img src="' + esc(url) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">' : '';
+  const mark = '<span class="mark" aria-hidden="true">' + esc((d.n || '?').trim().charAt(0)) + '</span>';
+  const names = d.cmd || [];
+  const credit = (opts && opts.pair && first) ? '<span class="credit" data-art="' + esc([[first, names[0]], [second, names[1]]].filter(x => x[0]).map(x => x[0] + '\t' + (x[1] || '')).join('|')) + '"></span>' : '';
+  return '<div class="art ' + (extraClass || '') + (second ? ' split' : '') + '" style="' + artStyle(d.ci) + '">' + mark + img(first) + img(second) + credit + '</div>';
+}
+
+/* Artist credit for commander art. The art is cropped from Scryfall images, which
+   cuts off the printed artist line, so the artist is named on the large images.
+   Names come from Scryfall's card data, one request at a time, and are kept. */
+const ARTISTS = store.get('artists', {});
+let creditQueue = Promise.resolve();
+function scryfallDataUrl(imageUrl, name) {
+  // The exact printing when the image address names it; otherwise the commander by name.
+  const id = /\/art_crop\/(?:front|back)\/[0-9a-f]\/[0-9a-f]\/([0-9a-f-]{36})\./.exec(imageUrl);
+  if (id) return 'https://api.scryfall.com/cards/' + id[1];
+  const named = /api\.scryfall\.com\/cards\/named\?exact=([^&]+)/.exec(imageUrl);
+  if (named) return 'https://api.scryfall.com/cards/named?exact=' + named[1];
+  return name ? 'https://api.scryfall.com/cards/named?exact=' + enc(name) : '';
+}
+function artistFor(entry) {
+  const [imageUrl, name] = entry.split('\t');
+  if (ARTISTS[imageUrl] !== undefined) return Promise.resolve(ARTISTS[imageUrl]);
+  const url = scryfallDataUrl(imageUrl, name);
+  if (!url) return Promise.resolve('');
+  creditQueue = creditQueue.then(() => fetch(url).then(r => r.ok ? r.json() : null).catch(() => null).then(card => {
+    const artist = card ? (card.artist || ((card.card_faces || [])[0] || {}).artist || '') : null;
+    if (artist !== null) { ARTISTS[imageUrl] = artist; store.set('artists', ARTISTS); }
+    return new Promise(r => setTimeout(r, 100)); // Scryfall asks for a short pause between requests
+  }));
+  return creditQueue.then(() => ARTISTS[imageUrl] || '');
+}
+function fillCredits() {
+  document.querySelectorAll('.credit[data-art]:not([data-done])').forEach(el => {
+    el.dataset.done = '1';
+    Promise.all(el.dataset.art.split('|').map(artistFor)).then(names => {
+      const list = [...new Set(names.filter(Boolean))];
+      if (list.length) el.textContent = 'Art: ' + list.join(' and ');
+    });
+  });
+}
+
+function avatarColor(pi) {
+  const s = stats().players[pi] || (allTime().players[pi]);
+  const sig = s && s.signature != null ? deck(s.signature).ci : '';
+  const c = String(sig || '').charAt(0);
+  return MANA_HEX[c] || '#c4b08c';
+}
+function avatar(pi, size) {
+  const name = player(pi).n;
+  const initials = name.replace(/\s*\(.*\)$/, '').replace(/[^\p{L}\p{N} ]/gu, '').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+  return '<span class="av ' + (size || '') + '" style="--av:' + avatarColor(pi) + '" aria-hidden="true">' + esc(initials) + '</span>';
+}
+
+function form(results, n) {
+  const list = results.slice(0, n || 10);
+  const label = list.filter(Boolean).length + ' wins in the last ' + list.length;
+  return '<span class="form" role="img" aria-label="' + label + '">' + list.map(r => '<i class="' + (r ? 'w' : '') + '"></i>').join('') + '</span>';
+}
+
+const ICON = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>',
+  standings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M9 20V8h6v12"/><path d="M3 20v-7h6"/><path d="M15 20v-9h6v9"/><path d="M2 20h20"/></svg>',
+  battles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 4l11 11"/><path d="M19 4 8 15"/><path d="M4 16l4 4M20 16l-4 4"/><path d="M6 18l2-2M18 18l-2-2"/></svg>',
+  decks: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="7" y="3" width="12" height="16" rx="2"/><path d="M5 6v13a2 2 0 0 0 2 2h9"/></svg>',
+  nights: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
+  swap: '<svg class="swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4"/><path d="M3 8h13"/><path d="m17 20 4-4-4-4"/><path d="M21 16H8"/></svg>',
+  back: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>'
+};
+const SIGIL = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="41" fill="none" stroke="#dcb462" stroke-width="4"/>' +
+  ['#efe2b4', '#4aa8e4', '#a3958a', '#e2563a', '#6fb041'].map((c, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / 5;
+    return '<circle cx="' + (50 + 29 * Math.cos(a)).toFixed(1) + '" cy="' + (50 + 29 * Math.sin(a)).toFixed(1) + '" r="7" fill="' + c + '" stroke="#dcb462" stroke-width="1.5"/>';
+  }).join('') + '<path d="M50 35 61 50 50 65 39 50z" fill="#dcb462"/><path d="M50 44 54.5 50 50 56 45.5 50z" fill="#1a130b"/></svg>';
+
+/* ---------------- API, offline outbox and demo server ---------------- */
+async function api(fn, args) {
+  if (DEMO) return demoApi(fn, args || {});
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 45000);
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(TOKEN() ? { fn, token: TOKEN(), args: args || {} } : { fn, pass: S.pass, args: args || {} }),
+      signal: controller.signal,
+      redirect: 'follow'
+    });
+    return await res.json();
+  } catch (e) {
+    return { ok: false, offline: true, error: 'The Grimoire could not be reached.' };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function refresh(quiet) {
+  const out = await api('appData', { me: S.me, have: S.data ? S.data.v : '' });
+  if (out.auth) { signOut(out.error); return false; }
+  if (!out.ok) {
+    S.offline = true;
+    if (!quiet) toast(out.offline ? 'No connection. Showing saved data.' : out.error);
+    render();
+    return false;
+  }
+  S.offline = false;
+  S.server = out.build || S.server;
+  if (out.data.you && TOKEN()) { // the server says which player this Discord account is
+    const key = out.data.you.player || '';
+    if (key !== S.me) { S.me = key; if (key) store.set('me', key); else store.del('me'); }
+  }
+  if (out.data.dataset) { S.data = out.data.dataset; store.set('data', S.data); STATS_KEY = ''; }
+  applyLive(out.data.live);
+  S.syncedAt = Date.now(); store.set('syncedAt', S.syncedAt); store.set('server', S.server);
+  render();
+  return true;
+}
+
+function applyLive(live) {
+  if (!live) return;
+  S.live = live;
+  // Keep showing changes that are still waiting in the outbox.
+  S.outbox.forEach(item => applyLocal(item));
+  store.set('live', S.live);
+}
+
+/** Saves a change now on this phone, then sends it; retries when offline. */
+function send(fn, args, okMessage) {
+  const item = { id: uid('o'), fn, args, okMessage };
+  S.outbox.push(item);
+  store.set('outbox', S.outbox);
+  applyLocal(item);
+  store.set('live', S.live);
+  render();
+  flush();
+}
+
+let flushing = false;
+let retryTimer = null;
+async function flush() {
+  if (flushing || !S.outbox.length) return;
+  flushing = true;
+  while (S.outbox.length) {
+    const item = S.outbox[0];
+    const out = await api(item.fn, item.args);
+    if (out.auth) { flushing = false; signOut(out.error); return; }
+    if (out.ok) {
+      S.outbox.shift();
+      store.set('outbox', S.outbox);
+      applyLive(out.data);
+      if (item.okMessage) toast(item.okMessage);
+      S.offline = false;
+      continue;
+    }
+    if (out.offline || out.busy) {
+      S.offline = Boolean(out.offline);
+      clearTimeout(retryTimer);
+      retryTimer = setTimeout(flush, 15000);
+      break;
+    }
+    // The server refused the change (for example, the night was cancelled).
+    S.outbox.shift();
+    store.set('outbox', S.outbox);
+    toast(out.error || 'That change could not be saved.');
+    flushing = false;
+    await refresh(true);
+    flushing = true;
+  }
+  flushing = false;
+  render();
+}
+window.addEventListener('online', () => { flush(); refresh(true); });
+
+/** Mirrors the server's rules so the screen updates before the reply. */
+function applyLocal(item) {
+  const a = item.args;
+  const live = S.live;
+  if (item.fn === 'appRsvp') {
+    const key = a.me; // players answer only for themselves
+    live.rsvps = live.rsvps.filter(r => !(r.night === a.nightId && r.player === key));
+    if (a.status) live.rsvps.push({ night: a.nightId, player: key, status: a.status });
+    const night = live.nights.find(n => n.id === a.nightId);
+    if (night) {
+      night.pods = [];
+      // Leaving the table hides the address again; joining shows it after the server replies.
+      if (a.status !== 'in' && night.createdBy !== a.me && night.place && !DEMO) { night.place = ''; night.placeHidden = true; }
+    }
+  } else if (item.fn === 'appSaveNight') {
+    const existing = live.nights.find(n => n.id === a.night.id);
+    if (existing) Object.assign(existing, a.night);
+    else {
+      live.nights.push(Object.assign({ status: 'scheduled', pods: [], createdBy: a.me }, a.night));
+      if (!live.rsvps.some(r => r.night === a.night.id && r.player === a.me)) live.rsvps.push({ night: a.night.id, player: a.me, status: 'in' });
+    }
+  } else if (item.fn === 'appCancelNight') {
+    const night = live.nights.find(n => n.id === a.nightId);
+    if (night) night.status = 'cancelled';
+  } else if (item.fn === 'appSaveStory') {
+    const by = player(meIndex()).n;
+    live.stories = live.stories.filter(s => !(s.gameId === String(a.gameId) && s.by === by));
+    live.stories.push({ gameId: String(a.gameId), by, summary: a.summary, mvp: a.mvp, moment: a.moment });
+  }
+}
+
+let DEMO_DATA = null;
+async function demoApi(fn, args) {
+  if (!DEMO_DATA) {
+    const res = await fetch('demo.json');
+    DEMO_DATA = await res.json();
+    const saved = store.get('demoLive', null);
+    if (saved) DEMO_DATA.live = saved;
+  }
+  await new Promise(r => setTimeout(r, 120));
+  const live = DEMO_DATA.live;
+  const forViewer = () => {
+    const ins = new Set(live.rsvps.filter(r => r.player === args.me && r.status === 'in').map(r => r.night));
+    return Object.assign({}, live, { nights: live.nights.map(n => (n.place && n.createdBy !== args.me && !ins.has(n.id)) ? Object.assign({}, n, { place: '', placeHidden: true }) : n) });
+  };
+  const save = () => { store.set('demoLive', live); return { ok: true, build: 'demo', data: forViewer() }; };
+  if (fn === 'appData') return { ok: true, build: 'demo', data: { v: 'demo', dataset: args.have === 'demo' ? null : DEMO_DATA.dataset, live: forViewer() } };
+  if (fn === 'appMakePods') {
+    const night = live.nights.find(n => n.id === args.nightId);
+    const ins = live.rsvps.filter(r => r.night === args.nightId && r.status === 'in').map(r => r.player);
+    if (ins.length < 3) return { ok: false, error: 'At least three players need to be In before pods can be made.' };
+    const size = Math.max(3, Math.min(5, +args.podSize || 4));
+    const count = Math.ceil(ins.length / size);
+    night.pods = Array.from({ length: count }, () => []);
+    ins.forEach((p, i) => night.pods[i % count].push(p));
+    return save();
+  }
+  applyLocal({ fn, args });
+  return save();
+}
+
+/* ---------------- Sheets and toasts ---------------- */
+let toastTimer = null;
+function toast(message) {
+  const el = $('#toast');
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+let sheetReturnFocus = null;
+function openSheet(html) {
+  sheetReturnFocus = document.activeElement;
+  const sheet = $('#sheet');
+  sheet.innerHTML = '<div class="grab"></div>' + html;
+  sheet.classList.add('open');
+  $('#scrim').classList.add('open');
+  const focusable = sheet.querySelector('input, select, textarea, button');
+  if (focusable) setTimeout(() => focusable.focus({ preventScroll: true }), 60);
+}
+function closeSheet() {
+  $('#sheet').classList.remove('open');
+  $('#scrim').classList.remove('open');
+  if (sheetReturnFocus && sheetReturnFocus.focus) sheetReturnFocus.focus({ preventScroll: true });
+}
+$('#scrim').addEventListener('click', closeSheet);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+/* ---------------- Router ---------------- */
+function route() {
+  const parts = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
+  return { name: parts[0] || 'home', arg: parts.slice(1).join('/') };
+}
+window.addEventListener('hashchange', () => { closeSheet(); render(); window.scrollTo(0, 0); });
+
+/* ---------------- Rendering ---------------- */
+let lastView = '';
+function render() {
+  const root = $('#root');
+  if (document.activeElement && document.activeElement.matches && document.activeElement.matches('input, textarea') && root.contains(document.activeElement)) {
+    return; // never redraw under someone's keyboard
+  }
+  if (!authed() || S.gate === 'pass') { root.innerHTML = gatePass(); return; }
+  if (!S.data) { root.innerHTML = loading(); return; }
+  if (!S.me && S.gate !== 'browse') { root.innerHTML = gatePick(); return; }
+
+  const r = route();
+  const views = { home: viewHome, standings: viewStandings, battles: viewBattles, decks: viewDecks, nights: viewNights, player: viewPlayer, deck: viewDeck, battle: viewBattle, night: viewNight };
+  const view = views[r.name] || viewHome;
+  const tab = { player: 'standings', deck: 'decks', battle: 'battles', night: 'nights' }[r.name] || r.name;
+  const firstHome = r.name === 'home' && lastView !== 'home';
+  lastView = r.name;
+  root.innerHTML = topBar() + '<main id="view">' + offlineNote() + view(r.arg, firstHome) + '</main>' + tabs(tab);
+  fillCredits();
+}
+
+function topBar() {
+  const mi = meIndex();
+  return '<header class="top">' + (window.CHOIR && !DEMO
+      ? '<a class="brand" href="' + esc(CHOIR.hubUrl) + '" aria-label="Grimoire. Switch to another part of Choir">' + SIGIL + '<span>Grimoire</span>' + ICON.swap + '</a>'
+      : '<button class="brand" data-act="home" aria-label="Commander Grimoire home">' + SIGIL + '<span>Grimoire</span></button>') +
+    (DEMO ? '<span class="demo-note">Demo</span>' : '') +
+    '<button class="filter-pill" data-act="filters" aria-label="Change season and group. Now showing ' + esc(filterLabel()) + '">' + esc(filterLabel()) + ICON.down + '</button>' +
+    '<button class="me-btn" data-act="account" aria-label="Account and settings">' + (mi >= 0 ? avatar(mi) : '<span class="av" style="--av:#c4b08c">?</span>') + '</button></header>';
+}
+
+function tabs(active) {
+  const items = [['home', 'Home'], ['standings', 'Standings'], ['battles', 'Battles'], ['decks', 'Decks'], ['nights', 'Nights']];
+  return '<nav class="tabs" aria-label="Sections">' + items.map(([id, label]) =>
+    '<a href="#/' + id + '"' + (active === id ? ' aria-current="page"' : '') + '>' + ICON[id] + label + '</a>').join('') + '</nav>';
+}
+
+function offlineNote() {
+  const waiting = S.outbox.length;
+  if (!S.offline && !waiting) return '';
+  const when = S.syncedAt ? ' from ' + new Date(S.syncedAt).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+  return '<p class="offline">' + (S.offline ? 'No connection. Showing saved data' + esc(when) + '. ' : '') +
+    (waiting ? plural(waiting, 'change') + ' will be sent when you are back online.' : '') + '</p>';
+}
+
+function loading() {
+  return '<div class="gate"><div><div class="cb-back"><div class="cb-oval"><div class="sigil">' + SIGIL + '</div><p>Opening the Grimoire…</p></div></div></div></div>';
+}
+
+/* ---------------- Sign-in ---------------- */
+function gatePass(error) {
+  return '<div class="gate"><div><div class="cb-back"><div class="cb-oval"><div class="sigil">' + SIGIL + '</div><h1>Commander Grimoire</h1>' +
+    '<p>Your group’s battles, rankings and game nights.</p></div></div>' +
+    '<form data-form="pass"><label class="field"><span>Group passcode (your organizer shared it in Discord)</span><input class="input" name="pass" type="password" autocomplete="current-password" required></label>' +
+    (S.gateError ? '<p class="muted" role="alert" style="margin:0 0 12px;color:var(--R)">' + esc(S.gateError) + '</p>' : '') +
+    '<button class="btn primary block" type="submit">Open the Grimoire</button></form>' +
+    (window.CHOIR ? '<p style="text-align:center;margin-top:18px"><a href="' + esc(CHOIR.root) + '">Sign in with Discord instead</a></p>' : '') + '</div></div>';
+}
+
+function gatePick() {
+  const st = allTime();
+  const list = D().players.map((p, i) => ({ i, p, s: st.players[i] }))
+    .sort((a, b) => (b.s ? b.s.games : 0) - (a.s ? a.s.games : 0) || a.p.n.localeCompare(b.p.n));
+  return '<div class="gate"><div style="width:min(420px,100%)"><h1>Who are you?</h1>' +
+    (TOKEN()
+      ? '<p>Pick your Grimoire player. Each player can be claimed by one Discord account; ask your organizer if yours is taken.</p>'
+      : '<p>Pick your name so the Grimoire can show your record first. You can change this later.</p>') +
+    '<input class="input" type="search" placeholder="Search names" aria-label="Search names" data-filter-list="pick">' +
+    '<ul class="pick" id="pick">' + list.map(x =>
+      '<li data-name="' + esc(player(x.i).n.toLowerCase()) + '"><button data-act="choose-me" data-key="' + esc(x.p.k) + '">' + avatar(x.i) +
+      '<span><b>' + esc(player(x.i).n) + '</b><small>' + (x.s ? plural(x.s.games, 'battle') + ' recorded' : 'No battles yet') + '</small></span></button></li>').join('') +
+    '</ul><p><button class="link-btn" data-act="browse">I’m just looking</button></p></div></div>';
+}
+
+function signOut(message) {
+  if (TOKEN()) { CHOIR.signOut('expired'); return; }
+  S.pass = ''; store.del('pass');
+  S.gateError = message || '';
+  render();
+}
+
+/* ---------------- Home ---------------- */
+function viewHome(_, reveal) {
+  const st = stats();
+  const mi = meIndex();
+  const me = st.players[mi];
+  let html = '';
+
+  if (me) {
+    const sig = me.signature;
+    const recent = me.history.slice(-5);
+    const delta = recent.length ? Math.round(me.rating - (recent.length < me.history.length ? me.history[me.history.length - recent.length - 1].r : Engine.RATING_START)) : 0;
+    html += '<section class="hero' + (reveal ? ' reveal' : '') + '">' + art(sig, '', { pair: true }) +
+      '<div class="hero-body"><div class="rank"><b class="num">' + ordinal(me.rank) + '</b><span>of ' + st.standings.length + ' players</span></div>' +
+      '<h1>' + esc(player(mi).n) + '</h1>' +
+      '<div class="stats">' +
+      '<div class="stat"><b class="num">' + me.wins + '–' + me.losses + '</b><span>Wins and losses</span></div>' +
+      '<div class="stat"><b class="num">' + pct(me.winRate) + '</b><span>Win rate</span></div>' +
+      '<div class="stat"><b class="num">' + me.ratingRounded + (delta ? '<span class="delta ' + (delta > 0 ? 'up' : 'down') + '" title="Change over your last 5 battles" aria-label="' + (delta > 0 ? 'up ' : 'down ') + Math.abs(delta) + ' over your last 5 battles">' + (delta > 0 ? '+' : '−') + Math.abs(delta) + '</span>' : '') + '</b><span>Rating</span></div>' +
+      '</div><div class="sig">' + form(me.results, 10) + '<span>Last ' + Math.min(10, me.results.length) + '</span></div>' +
+      (sig != null ? '<div class="sig">Signature deck <a href="#/deck/' + enc(deck(sig).k) + '">' + esc(deck(sig).n) + '</a>' + pips(deck(sig).ci) + '</div>' : '') +
+      '</div></section>';
+  } else if (mi >= 0) {
+    html += '<h1 class="page-title">' + esc(player(mi).n) + '</h1><p class="page-sub">No battles in ' + esc(filterLabel()) + '. Try All time.</p>';
+  } else {
+    const leader = st.standings[0];
+    html += '<h1 class="page-title">The Grimoire</h1><p class="page-sub">' + (leader ? esc(player(leader.index).n) + ' leads with ' + plural(leader.wins, 'win') + '.' : 'No battles recorded yet.') + '</p>';
+  }
+
+  const next = upcomingNights()[0];
+  html += '<section class="section"><h2>Next game night<a href="#/nights">All nights</a></h2>' +
+    (next ? nightCard(next) : '<div class="panel empty">No game night is planned.<br><button class="btn primary" data-act="new-night">Plan a game night</button></div>') + '</section>';
+
+  if (me) {
+    const notes = Engine.insights(S.data, st, mi);
+    if (notes.length) {
+      html += '<section class="section"><h2>Worth knowing</h2><ul class="panel insights">' + notes.map(insightRow).join('') + '</ul></section>';
+    }
+    const lastMine = st.games.find(g => g.pod.some(s => s[0] === mi));
+    if (lastMine) html += '<section class="section"><h2>Your last battle</h2><ul class="panel list">' + battleRow(lastMine) + '</ul></section>';
+  }
+
+  const top = st.standings.slice(0, 5);
+  if (me && me.rank > 5) top.push(me);
+  html += '<section class="section"><h2>The table<a href="#/standings">Full standings</a></h2><ul class="panel list">' + top.map(p => standingRow(p, mi)).join('') + '</ul></section>';
+  html += '<section class="section"><a class="btn block" href="' + PLAYGROUP_URL + '" target="_blank" rel="noopener">Log a battle in Playgroup.gg</a></section>';
+  return html;
+}
+
+function insightRow(n) {
+  if (n.kind === 'nemesis') return '<li><a href="#/player/' + enc(player(n.player).k) + '"><span class="glyph">☠</span><span><b>' + esc(player(n.player).n) + '</b> has beaten you ' + plural(n.value, 'time') + ' in ' + n.games + ' shared battles.</span></a></li>';
+  if (n.kind === 'prey') return '<li><a href="#/player/' + enc(player(n.player).k) + '"><span class="glyph">⚔</span><span>You have beaten <b>' + esc(player(n.player).n) + '</b> ' + plural(n.value, 'time') + ' in ' + n.games + ' shared battles.</span></a></li>';
+  if (n.kind === 'bestDeck') return '<li><a href="#/deck/' + enc(deck(n.deck).k) + '"><span class="glyph">✦</span><span>Your best deck is <b>' + esc(deck(n.deck).n) + '</b>, winning ' + pct(n.value) + ' of ' + n.games + ' battles.</span></a></li>';
+  if (n.kind === 'streak') return '<li><div><span class="glyph">' + (n.streakKind === 'W' ? '↑' : '↓') + '</span><span>' + (n.streakKind === 'W' ? 'You have won your last ' + n.value + ' battles.' : 'You have lost your last ' + n.value + '. The next one is due.') + '</span></div></li>';
+  if (n.kind === 'first') return '<li><div><span class="glyph">1</span><span>When you go first, you win ' + pct(n.value) + ' of the time (' + plural(n.games, 'battle') + ').</span></div></li>';
+  return '';
+}
+
+function standingRow(p, mi) {
+  const sig = p.signature != null ? deck(p.signature).n : '';
+  return '<li class="' + (p.index === mi ? 'me' : '') + '"><a class="row standing" href="#/player/' + enc(player(p.index).k) + '">' +
+    '<span class="pos num">' + p.rank + '</span>' + avatar(p.index) +
+    '<span class="who-name"><b>' + esc(player(p.index).n) + '</b><small>' + esc(sig) + '</small></span>' +
+    '<span class="rec"><b class="num">' + p.wins + '–' + p.losses + '</b><small class="num">' + pct(p.winRate) + '</small></span></a></li>';
+}
+
+/* ---------------- Standings ---------------- */
+function viewStandings() {
+  const st = stats();
+  const mi = meIndex();
+  const sort = S.ui.sort;
+  const list = st.standings.slice();
+  if (sort === 'rate') list.sort((a, b) => b.winRate - a.winRate || b.games - a.games);
+  if (sort === 'rating') list.sort((a, b) => b.rating - a.rating || b.games - a.games);
+  list.forEach((p, i) => { p.shown = i + 1; });
+  if (!list.length) return '<h1 class="page-title">Standings</h1>' + emptyScope();
+
+  const podium = list.slice(0, 3);
+  const order = [podium[1], podium[0], podium[2]].filter(Boolean);
+  const metric = p => sort === 'rating' ? p.ratingRounded + ' rating' : sort === 'rate' ? pct(p.winRate) + ' of ' + p.games : plural(p.wins, 'win');
+  let html = '<h1 class="page-title">Standings</h1><p class="page-sub">' + esc(filterLabel()) + ', ' + plural(st.games.length, 'battle') + '</p>' +
+    '<div class="seg" role="group" aria-label="Rank by">' + [['wins', 'Wins'], ['rate', 'Win rate'], ['rating', 'Rating']].map(([v, l]) =>
+      '<button data-act="sort" data-v="' + v + '" aria-pressed="' + (sort === v) + '">' + l + '</button>').join('') + '</div>';
+  html += '<div class="podium">' + order.map(p => {
+    const place = p.shown;
+    return '<a class="p' + place + '" href="#/player/' + enc(player(p.index).k) + '">' + art(p.signature) +
+      '<div class="place num">' + place + '</div><b>' + esc(player(p.index).n) + '</b><small>' + esc(metric(p)) + '</small></a>';
+  }).join('') + '</div>';
+  html += '<ul class="panel list">' + list.map(p => {
+    const sig = p.signature != null ? deck(p.signature).n : '';
+    const right = sort === 'rating'
+      ? '<b class="num">' + p.ratingRounded + '</b><small class="num">' + p.wins + '–' + p.losses + '</small>'
+      : '<b class="num">' + p.wins + '–' + p.losses + '</b><small class="num">' + pct(p.winRate) + '</small>';
+    return '<li class="' + (p.index === mi ? 'me' : '') + '"><a class="row standing" href="#/player/' + enc(player(p.index).k) + '">' +
+      '<span class="pos num">' + p.shown + '</span>' + avatar(p.index) +
+      '<span class="who-name"><b>' + esc(player(p.index).n) + '</b><small>' + form(p.results, 5) + ' ' + esc(sig) + '</small></span>' +
+      '<span class="rec">' + right + '</span></a></li>';
+  }).join('') + '</ul>';
+  if (sort === 'rate') html += '<p class="muted" style="font-size:14px;margin-top:10px">Win rate favors players with few battles. Check the battle count before bragging.</p>';
+  return html;
+}
+
+function emptyScope() {
+  return '<div class="panel empty">No battles in ' + esc(filterLabel()) + '.<br><button class="btn" data-act="filters">Change season or group</button></div>';
+}
+
+/* ---------------- Battles ---------------- */
+function battleRow(g) {
+  const win = g.pod.find(s => s[2] === 1);
+  const names = g.pod.map(s => player(s[0]).n).join(', ');
+  const title = win ? esc(player(win[0]).n) + ' won with ' + esc(deck(win[1]).n) : 'No winner recorded';
+  return '<li><a class="row battle" href="#/battle/' + enc(g.g + ':' + g.id) + '">' + art(win ? win[1] : null) +
+    '<span style="min-width:0"><b>' + title + '</b><small>' + esc(names) + '</small></span>' +
+    '<span class="when">' + esc(fmtDay(g.d, { month: 'short', day: 'numeric' })) + (g.r != null ? '<br>' + plural(g.r, 'turn') : '') + '</span></a></li>';
+}
+
+function viewBattles() {
+  const st = stats();
+  const mi = meIndex();
+  let games = st.games;
+  if (S.ui.mine && mi >= 0) games = games.filter(g => g.pod.some(s => s[0] === mi));
+  const q = (S.ui.q || '').toLowerCase().trim();
+  if (q) games = games.filter(g => g.pod.some(s => player(s[0]).n.toLowerCase().includes(q) || deck(s[1]).n.toLowerCase().includes(q)) || groupName(g.g).toLowerCase().includes(q));
+  let html = '<h1 class="page-title">Battles</h1><p class="page-sub">' + esc(filterLabel()) + '</p>' +
+    '<input class="input" type="search" placeholder="Search players or decks" aria-label="Search players or decks" data-input="q" value="' + esc(S.ui.q || '') + '">' +
+    (mi >= 0 ? '<div class="chips" style="margin-top:10px"><button class="chip" data-act="mine" aria-pressed="' + Boolean(S.ui.mine) + '">Only my battles</button></div>' : '');
+  if (!games.length) return html + '<div class="panel empty" style="margin-top:16px">No battles match.</div>';
+  let month = '';
+  let open = false;
+  games.slice(0, 300).forEach(g => {
+    const m = fmtDay(g.d, { month: 'long', year: 'numeric' });
+    if (m !== month) {
+      if (open) html += '</ul>';
+      html += '<h2 class="month">' + esc(m) + '</h2><ul class="panel list">';
+      month = m; open = true;
+    }
+    html += battleRow(g);
+  });
+  if (open) html += '</ul>';
+  return html;
+}
+
+function viewBattle(arg) {
+  const [g, id] = arg.split(':');
+  const game = S.data.games.find(x => String(x.g) === g && String(x.id) === id);
+  if (!game) return notFound('That battle');
+  const win = game.pod.find(s => s[2] === 1);
+  const mi = meIndex();
+  const seats = game.pod.slice().sort((a, b) => b[2] - a[2]);
+  const stories = S.live.stories.filter(s => s.gameId === String(game.id));
+  let html = '<section class="detail-hero">' + backLink('#/battles', 'Battles') + art(win ? win[1] : null, '', { pair: true }) +
+    '<div class="hero-body"><h1>' + (win ? esc(player(win[0]).n) + ' won' : 'Battle ' + esc(game.id)) + '</h1>' +
+    '<p>' + esc(fmtDay(game.d, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })) + ', ' + esc(groupName(game.g)) + '</p></div></section>' +
+    '<div class="facts"><div><b class="num">' + (game.r != null ? game.r : '–') + '</b><span>Turns</span></div><div><b class="num">' + game.pod.length + '</b><span>Players</span></div>' +
+    '<div><b style="font-size:19px;line-height:1.35">' + esc(cap(game.wc) || 'Not recorded') + '</b><span>How it ended</span></div></div>';
+  html += '<section class="section"><h2>The pod</h2><ul class="panel list">' + seats.map(s => {
+    const bits = [];
+    if (s[6] != null) bits.push(s[6] + ' life left');
+    if (s[7]) bits.push(plural(s[7], 'kill'));
+    if (s[3] != null) bits.push('fun ' + s[3]);
+    if (s[4] != null) bits.push('salt ' + s[4]);
+    if (s[8]) bits.push('went first');
+    if (s[5]) bits.push(plural(s[5], 'mulligan'));
+    return '<li><a class="row seat" href="#/deck/' + enc(deck(s[1]).k) + '">' + avatar(s[0]) +
+      '<span style="min-width:0"><b>' + esc(player(s[0]).n) + '</b><small>' + esc(deck(s[1]).n) + ' ' + pips(deck(s[1]).ci) + '</small><small>' + esc(bits.join(', ')) + '</small></span>' +
+      '<span class="res ' + (s[2] ? 'w' : '') + '">' + (s[2] ? 'Won' : 'Lost') + '</span></a></li>';
+  }).join('') + '</ul></section>';
+  const inPod = game.pod.some(s => s[0] === mi);
+  html += '<section class="section"><h2>The story</h2>' + (stories.length
+    ? '<div class="panel">' + stories.map(s => '<div class="story"><p>' + esc(s.summary || s.moment || s.mvp) + '</p><small>' + esc(s.by) +
+      (s.mvp ? ', MVP: ' + esc(s.mvp) : '') + (s.moment && s.summary ? '. ' + esc(s.moment) : '') + '</small></div>').join('') + '</div>'
+    : '<div class="panel empty">Nobody has told this one yet.</div>') +
+    (inPod ? '<p><button class="btn block" style="margin-top:12px" data-act="story" data-game="' + esc(game.id) + '">' + (stories.some(s => s.by === player(mi).n) ? 'Edit your story' : 'Add your story') + '</button></p>' : '') + '</section>';
+  return html;
+}
+
+function cap(text) { const t = String(text || '').toLowerCase(); return t.charAt(0).toUpperCase() + t.slice(1); }
+
+/* ---------------- Decks ---------------- */
+function viewDecks() {
+  const st = stats();
+  const colors = S.ui.colors || [];
+  const q = (S.ui.dq || '').toLowerCase().trim();
+  let list = st.deckList.filter(d => colors.every(c => c === 'C' ? !deck(d.index).ci : String(deck(d.index).ci).includes(c)));
+  if (q) list = list.filter(d => deck(d.index).n.toLowerCase().includes(q) || (deck(d.index).cmd || []).join(' ').toLowerCase().includes(q) || player(deck(d.index).p).n.toLowerCase().includes(q));
+  if (S.ui.deckSort === 'rate') list.sort((a, b) => b.winRate - a.winRate || b.games - a.games);
+  if (S.ui.deckSort === 'played') list.sort((a, b) => b.games - a.games || b.wins - a.wins);
+  let html = '<h1 class="page-title">Decks</h1><p class="page-sub">' + esc(filterLabel()) + ', ' + plural(st.deckList.length, 'deck') + '</p>' +
+    '<input class="input" type="search" placeholder="Search decks, commanders or pilots" aria-label="Search decks" data-input="dq" value="' + esc(S.ui.dq || '') + '">' +
+    '<div class="mana-filter" role="group" aria-label="Filter by color">' + ['W', 'U', 'B', 'R', 'G', 'C'].map(c =>
+      '<button data-act="color" data-c="' + c + '" aria-pressed="' + colors.includes(c) + '" aria-label="' + COLOR_NAMES[c] + '"><i class="pip ' + c + '"></i></button>').join('') + '</div>' +
+    '<div class="seg" role="group" aria-label="Sort decks by">' + [['wins', 'Wins'], ['rate', 'Win rate'], ['played', 'Most played']].map(([v, l]) =>
+      '<button data-act="deck-sort" data-v="' + v + '" aria-pressed="' + (S.ui.deckSort === v) + '">' + l + '</button>').join('') + '</div>';
+  if (!list.length) return html + '<div class="panel empty" style="margin-top:16px">No decks match those colors.</div>';
+  html += '<div class="deck-grid" style="margin-top:16px">' + list.map(d => {
+    const info = deck(d.index);
+    return '<a class="deck-tile" href="#/deck/' + enc(info.k) + '">' + art(d.index) + '<div class="body"><b>' + esc(info.n) + '</b>' +
+      '<small>' + esc(player(info.p).n) + '</small><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">' + pips(info.ci) +
+      '<small class="num">' + d.wins + '–' + d.losses + '</small></div><div class="bar" role="img" aria-label="Win rate ' + pct(d.winRate) + '"><i style="width:' + Math.round(d.winRate * 100) + '%"></i></div></div></a>';
+  }).join('') + '</div>';
+  return html;
+}
+
+function viewDeck(key) {
+  const di = deckIndexByKey(key);
+  if (di < 0) return notFound('That deck');
+  const info = deck(di);
+  const st = stats();
+  const d = st.decks[di];
+  let html = '<section class="detail-hero">' + backLink('#/decks', 'Decks') + art(di, '', { pair: true }) +
+    '<div class="hero-body"><h1>' + esc(info.n) + '</h1><p>' + pips(info.ci) + ' ' + esc((info.cmd || []).join(' and ') || 'Commander not recorded') +
+    ', piloted by <a href="#/player/' + enc(player(info.p).k) + '">' + esc(player(info.p).n) + '</a></p></div></section>';
+  if (!d) return html + '<div class="panel empty" style="margin-top:18px">This deck has no battles in ' + esc(filterLabel()) + '.</div>';
+  const rank = st.deckList.indexOf(d) + 1;
+  const topCon = Object.keys(d.wincons).sort((a, b) => d.wincons[b] - d.wincons[a])[0];
+  html += '<div class="facts"><div><b class="num">' + d.wins + '–' + d.losses + '</b><span>Record</span></div><div><b class="num">' + pct(d.winRate) + '</b><span>Win rate</span></div>' +
+    '<div><b class="num">' + ordinal(rank) + '</b><span>of ' + st.deckList.length + ' decks</span></div><div><b class="num">' + one(d.roundsToWin) + '</b><span>Turns to win</span></div>' +
+    '<div><b class="num">' + one(d.fun) + '</b><span>Fun, out of 5</span></div><div><b class="num">' + one(d.salt) + '</b><span>Salt, out of 5</span></div></div>';
+  html += '<section class="section"><h2>Recent form</h2><div class="panel" style="padding:14px 16px">' + form(d.results, 20) +
+    (topCon ? '<p class="muted" style="margin:10px 0 0">Usually wins by ' + esc(topCon.toLowerCase()) + '.</p>' : '') + '</div></section>';
+  const vs = Object.keys(d.vs).map(k => d.vs[k]).sort((a, b) => b.games - a.games).slice(0, 8);
+  if (vs.length) {
+    html += '<section class="section"><h2>Against each player</h2><div class="panel"><table class="h2h"><thead><tr><th>Opponent</th><th class="n" style="text-align:right">Battles</th><th style="text-align:right">This deck won</th></tr></thead><tbody>' +
+      vs.map(v => '<tr><td><a href="#/player/' + enc(player(v.player).k) + '">' + avatar(v.player, 'sm') + esc(player(v.player).n) + '</a></td><td class="n">' + v.games + '</td><td class="n">' + v.wins + ' (' + pct(v.wins / v.games) + ')</td></tr>').join('') +
+      '</tbody></table></div></section>';
+  }
+  const links = [];
+  if (info.stats) links.push('<a href="' + esc(info.stats) + '" target="_blank" rel="noopener">Playgroup.gg stats</a>');
+  if (info.list) links.push('<a href="' + esc(info.list) + '" target="_blank" rel="noopener">' + esc(info.plat || 'Decklist') + '</a>');
+  (info.cmd || []).forEach(n => links.push('<a href="https://scryfall.com/search?q=' + enc('!"' + n + '"') + '" target="_blank" rel="noopener">' + esc(n) + ' on Scryfall</a>'));
+  if (links.length) html += '<div class="links">' + links.join('') + '</div>';
+  const games = st.games.filter(g => g.pod.some(s => s[1] === di)).slice(0, 8);
+  html += '<section class="section"><h2>Battles</h2><ul class="panel list">' + games.map(battleRow).join('') + '</ul></section>';
+  return html;
+}
+
+/* ---------------- Players ---------------- */
+function viewPlayer(key) {
+  const pi = playerIndex(key);
+  if (pi < 0) return notFound('That player');
+  const st = stats();
+  const p = st.players[pi];
+  let html = '<section class="detail-hero">' + backLink('#/standings', 'Standings') + art(p ? p.signature : null, '', { pair: true }) +
+    '<div class="hero-body">' + (p ? '<div class="rank" style="display:flex;align-items:baseline;gap:8px"><b class="serif num" style="font-size:56px;line-height:.9;color:var(--gilt)">' + ordinal(p.rank) + '</b><span class="muted">of ' + st.standings.length + '</span></div>' : '') +
+    '<h1>' + esc(player(pi).n) + '</h1>' + (key === S.me ? '<p>That’s you.</p>' : '') + '</div></section>';
+  if (!p) return html + '<div class="panel empty" style="margin-top:18px">No battles in ' + esc(filterLabel()) + '.</div>';
+  html += '<div class="facts"><div><b class="num">' + p.wins + '–' + p.losses + '</b><span>Record</span></div><div><b class="num">' + pct(p.winRate) + '</b><span>Win rate</span></div>' +
+    '<div><b class="num">' + p.ratingRounded + '</b><span>Rating</span></div><div><b class="num">' + one(p.fun) + '</b><span>Fun given</span></div>' +
+    '<div><b class="num">' + one(p.salt) + '</b><span>Salt given</span></div><div><b class="num">' + turnTime(p.turnSeconds) + '</b><span>Average turn</span></div></div>';
+  if (p.history.length > 1) html += '<section class="section"><h2>Rating over time</h2><div class="panel" style="padding:12px 8px 6px">' + ratingChart(p.history) + '</div></section>';
+  html += '<section class="section"><h2>Recent form</h2><div class="panel" style="padding:14px 16px">' + form(p.results, 20) +
+    (p.streak.length >= 2 ? '<p class="muted" style="margin:10px 0 0">' + (p.streak.kind === 'W' ? 'On a ' + p.streak.length + '-battle winning streak.' : 'Lost the last ' + p.streak.length + '.') + '</p>' : '') + '</div></section>';
+
+  const rivals = Engine.rivals(st, pi).slice(0, 10);
+  if (rivals.length) {
+    html += '<section class="section"><h2>Head to head</h2><div class="panel"><table class="h2h"><thead><tr><th>Opponent</th><th style="text-align:right">Battles</th><th style="text-align:right">Wins each</th></tr></thead><tbody>' +
+      rivals.map(r => '<tr><td><a href="#/player/' + enc(player(r.player).k) + '">' + avatar(r.player, 'sm') + esc(player(r.player).n) + '</a></td><td class="n">' + r.games + '</td><td class="n">' +
+        '<span style="color:' + (r.myWins > r.theirWins ? 'var(--gilt)' : 'inherit') + '">' + r.myWins + '</span> to ' + r.theirWins + '</td></tr>').join('') +
+      '</tbody></table></div><p class="muted" style="font-size:14px">Wins each counts battles you shared that one of you won.</p></section>';
+  }
+  const decks = Object.keys(p.decks).map(k => p.decks[k]).sort((a, b) => b.games - a.games);
+  html += '<section class="section"><h2>Decks played</h2><ul class="panel list">' + decks.map(d =>
+    '<li><a class="row battle" href="#/deck/' + enc(deck(d.deck).k) + '">' + art(d.deck) + '<span><b>' + esc(deck(d.deck).n) + '</b><small>' + pips(deck(d.deck).ci) + '</small></span>' +
+    '<span class="when num">' + d.wins + '–' + (d.games - d.wins) + '<br>' + pct(d.wins / d.games) + '</span></a></li>').join('') + '</ul></section>';
+  html += '<section class="section"><h2>Recent battles</h2><ul class="panel list">' + st.games.filter(g => g.pod.some(s => s[0] === pi)).slice(0, 6).map(battleRow).join('') + '</ul></section>';
+  if (key === S.me) html += '<p><button class="btn block" data-act="account">Switch player</button></p>';
+  return html;
+}
+
+function ratingChart(history) {
+  const W = 600, H = 150, P = 8;
+  const values = [Engine.RATING_START].concat(history.map(h => h.r));
+  const min = Math.min.apply(null, values) - 5;
+  const max = Math.max.apply(null, values) + 5;
+  const x = i => P + (i / (values.length - 1)) * (W - 2 * P);
+  const y = v => H - P - ((v - min) / (max - min)) * (H - 2 * P);
+  const line = values.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
+  const base = y(Engine.RATING_START).toFixed(1);
+  const last = values[values.length - 1];
+  return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="Rating went from 1000 to ' + Math.round(last) + ' over ' + history.length + ' battles">' +
+    '<line x1="0" x2="' + W + '" y1="' + base + '" y2="' + base + '" stroke="#4d3a22" stroke-dasharray="4 6" vector-effect="non-scaling-stroke"/>' +
+    '<path d="' + line + ' L' + x(values.length - 1).toFixed(1) + ' ' + H + ' L' + x(0) + ' ' + H + 'Z" fill="rgba(220,180,98,.12)"/>' +
+    '<path d="' + line + '" fill="none" stroke="#dcb462" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+    '<circle cx="' + x(values.length - 1).toFixed(1) + '" cy="' + y(last).toFixed(1) + '" r="5" fill="#f2d38e"/></svg>' +
+    '<div style="display:flex;justify-content:space-between;padding:2px 8px 4px;font-size:13px" class="muted"><span>Started at 1000</span><span class="num">Now ' + Math.round(last) + '</span></div>';
+}
+
+/* ---------------- Game nights ---------------- */
+function upcomingNights() {
+  const now = Date.now() - 5 * 3600000;
+  return S.live.nights.filter(n => n.status !== 'cancelled' && new Date(n.startsAt).getTime() >= now)
+    .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+}
+function rsvpsFor(nightId) { return S.live.rsvps.filter(r => r.night === nightId); }
+function myRsvp(nightId) { const r = rsvpsFor(nightId).find(x => x.player === S.me); return r ? r.status : ''; }
+
+function nightWhen(n, long) {
+  const d = new Date(n.startsAt);
+  return d.toLocaleString(undefined, long ? { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' } : { weekday: 'short', hour: 'numeric', minute: '2-digit' });
+}
+
+function rsvpControl(n) {
+  if (!S.me) return '';
+  const mine = myRsvp(n.id);
+  return '<div class="seg rsvp" role="group" aria-label="Are you coming?">' + [['in', 'I’m in'], ['maybe', 'Maybe'], ['out', 'Can’t go']].map(([v, l]) =>
+    '<button data-act="rsvp" data-night="' + esc(n.id) + '" data-v="' + v + '" aria-pressed="' + (mine === v) + '">' + l + '</button>').join('') + '</div>';
+}
+
+function nightCard(n) {
+  const d = new Date(n.startsAt);
+  const ins = rsvpsFor(n.id).filter(r => r.status === 'in');
+  const maybes = rsvpsFor(n.id).filter(r => r.status === 'maybe');
+  const faces = ins.map(r => playerIndex(r.player)).filter(i => i >= 0);
+  return '<div class="panel night-card"><div class="datebox"><b class="num">' + d.getDate() + '</b><span>' + esc(d.toLocaleDateString(undefined, { month: 'short' })) + '</span></div>' +
+    '<a href="#/night/' + enc(n.id) + '" style="color:inherit;text-decoration:none;min-width:0"><h3>' + esc(n.title || 'Commander night') + '</h3><p>' + esc(nightWhen(n)) + (n.place ? ', ' + esc(n.place) : '') + '</p></a>' +
+    '<div class="who"><span class="stack">' + faces.slice(0, 6).map(i => avatar(i, 'sm')).join('') + '</span>' +
+    '<span>' + ins.length + ' of ' + n.seats + ' seats' + (maybes.length ? ', ' + maybes.length + ' maybe' : '') + '</span></div>' + rsvpControl(n) + '</div>';
+}
+
+function viewNights() {
+  const upcoming = upcomingNights();
+  const past = S.live.nights.filter(n => !upcoming.includes(n)).sort((a, b) => new Date(b.startsAt) - new Date(a.startsAt));
+  let html = '<h1 class="page-title">Game nights</h1><p class="page-sub">Say whether you’re in, and the pods build themselves.</p>' +
+    (S.me ? '<button class="btn primary block" data-act="new-night">Plan a game night</button>' : '');
+  html += '<section class="section"><h2>Coming up</h2>' + (upcoming.length ? upcoming.map(n => nightCard(n)).join('<div style="height:12px"></div>') : '<div class="panel empty">Nothing planned yet.</div>') + '</section>';
+  if (past.length) {
+    html += '<section class="section"><h2>Earlier</h2><ul class="panel list">' + past.map(n =>
+      '<li><a class="row battle" href="#/night/' + enc(n.id) + '" style="grid-template-columns:1fr auto"><span><b>' + esc(n.title) + '</b><small>' + esc(nightWhen(n, true)) + '</small></span>' +
+      '<span class="when">' + (n.status === 'cancelled' ? 'Cancelled' : rsvpsFor(n.id).filter(r => r.status === 'in').length + ' played') + '</span></a></li>').join('') + '</ul></section>';
+  }
+  return html;
+}
+
+function viewNight(id) {
+  const n = S.live.nights.find(x => x.id === id);
+  if (!n) return notFound('That game night');
+  const rs = rsvpsFor(n.id);
+  const group = status => rs.filter(r => r.status === status).map(r => playerIndex(r.player)).filter(i => i >= 0);
+  const people = list => list.length ? '<div class="people">' + list.map(i => '<a href="#/player/' + enc(player(i).k) + '">' + avatar(i, 'sm') + esc(player(i).n) + '</a>').join('') + '</div>' : '<p class="muted" style="margin:0">Nobody yet.</p>';
+  const host = n.createdBy === S.me;
+  const cancelled = n.status === 'cancelled';
+  let html = '<div style="padding-top:8px">' + backLink('#/nights', 'Game nights', true) + '</div>' +
+    '<h1 class="page-title" style="margin-top:14px">' + esc(n.title || 'Commander night') + '</h1>' +
+    '<p class="page-sub">' + esc(nightWhen(n, true)) + (n.place ? '<br>' + esc(n.place) : n.placeHidden ? '<br>The address shows here once you’re In.' : '') + (n.host ? '<br>Hosted by ' + esc(n.host) : '') + '</p>' +
+    (cancelled ? '<p class="offline">This game night was cancelled.</p>' : rsvpControl(n)) +
+    (n.notes ? '<div class="panel" style="padding:14px 16px;margin-top:16px"><p class="serif" style="margin:0;font-size:19px">' + esc(n.notes) + '</p></div>' : '');
+  html += '<section class="section"><h2>In <span class="muted num" style="font-size:16px">' + group('in').length + ' of ' + n.seats + ' seats</span></h2><div class="panel" style="padding:14px 16px">' + people(group('in')) + '</div></section>';
+  if (group('maybe').length) html += '<section class="section"><h2>Maybe</h2><div class="panel" style="padding:14px 16px">' + people(group('maybe')) + '</div></section>';
+  if (group('out').length) html += '<section class="section"><h2>Can’t go</h2><div class="panel" style="padding:14px 16px">' + people(group('out')) + '</div></section>';
+
+  if (!cancelled) {
+    html += '<section class="section"><h2>Pods</h2>';
+    if (n.pods && n.pods.length) {
+      html += '<div class="panel">' + n.pods.map((pod, i) => '<div class="pod-table"><h3>Table ' + (i + 1) + '</h3>' + people(pod.map(playerIndex).filter(x => x >= 0)) + '</div>').join('') + '</div>' +
+        '<p class="muted" style="font-size:14px">Pods mix ratings and avoid repeat matchups. They reset when someone changes their answer.</p>';
+    } else {
+      html += '<div class="panel" style="padding:14px 16px"><p class="muted" style="margin:0 0 12px">' + (group('in').length >= 3 ? 'Ready when you are. Pods balance ratings and split up people who play each other most.' : 'Pods can be made once three people are in.') + '</p>' +
+        '<div class="seg" role="group" aria-label="Players per table">' + [3, 4, 5].map(sz => '<button data-act="pod-size" data-v="' + sz + '" aria-pressed="' + ((S.ui.podSize || 4) === sz) + '">' + sz + ' per table</button>').join('') + '</div>' +
+        '<button class="btn primary block" style="margin-top:10px" data-act="pods" data-night="' + esc(n.id) + '"' + (group('in').length < 3 || !S.me ? ' disabled' : '') + '>Make pods</button></div>';
+    }
+    html += '</section>';
+    // Framed previews (such as the Claude artifact viewer) cannot download files.
+    const canDownload = window.top === window.self;
+    html += '<div class="links">' + (canDownload ? '<a href="#" data-act="ics" data-night="' + esc(n.id) + '">Add to calendar</a>' : '') + '<a href="#" data-act="share" data-night="' + esc(n.id) + '">Share</a>' +
+      (host ? '<a href="#" data-act="edit-night" data-night="' + esc(n.id) + '">Edit</a><a href="#" data-act="cancel-night" data-night="' + esc(n.id) + '">Cancel night</a>' : '') + '</div>';
+  }
+  return html;
+}
+
+function nightForm(n) {
+  const start = n ? new Date(n.startsAt) : nextFridayAt7();
+  const pad = v => String(v).padStart(2, '0');
+  const dateVal = start.getFullYear() + '-' + pad(start.getMonth() + 1) + '-' + pad(start.getDate());
+  const timeVal = pad(start.getHours()) + ':' + pad(start.getMinutes());
+  return '<h2 id="sheet-title">' + (n ? 'Edit game night' : 'Plan a game night') + '</h2><form data-form="night">' +
+    '<input type="hidden" name="id" value="' + esc(n ? n.id : uid('n')) + '">' +
+    '<div class="row2"><label class="field"><span>Date</span><input class="input" type="date" name="date" value="' + dateVal + '" required></label>' +
+    '<label class="field"><span>Start time</span><input class="input" type="time" name="time" value="' + timeVal + '" required></label></div>' +
+    '<label class="field"><span>Name</span><input class="input" name="title" maxlength="60" value="' + esc(n ? n.title : 'Commander night') + '"></label>' +
+    '<label class="field"><span>Where</span><input class="input" name="place" maxlength="120" placeholder="Jordan’s place, or the game store" value="' + esc(n ? n.place : '') + '"></label>' +
+    '<div class="row2"><label class="field"><span>Host</span><input class="input" name="host" maxlength="60" value="' + esc(n ? n.host : player(meIndex()).n) + '"></label>' +
+    '<label class="field"><span>Seats</span><input class="input" type="number" name="seats" min="3" max="40" value="' + esc(n ? n.seats : 8) + '"></label></div>' +
+    '<label class="field"><span>Notes</span><textarea class="input" name="notes" maxlength="300" placeholder="Bring two decks. Pizza at 7:30.">' + esc(n ? n.notes : '') + '</textarea></label>' +
+    '<button class="btn primary block" type="submit">' + (n ? 'Save changes' : 'Schedule it') + '</button></form>';
+}
+
+function nextFridayAt7() {
+  const d = new Date();
+  d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7 || 7));
+  d.setHours(19, 0, 0, 0);
+  return d;
+}
+
+function icsFor(n) {
+  const stamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const start = new Date(n.startsAt);
+  const end = new Date(start.getTime() + 4 * 3600000);
+  const text = v => String(v || '').replace(/[\\,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Commander Grimoire//EN', 'BEGIN:VEVENT',
+    'UID:' + n.id + '@commander-grimoire', 'DTSTAMP:' + stamp(new Date()), 'DTSTART:' + stamp(start), 'DTEND:' + stamp(end),
+    'SUMMARY:' + text(n.title), 'LOCATION:' + text(n.place), 'DESCRIPTION:' + text(n.notes),
+    'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', 'DESCRIPTION:' + text(n.title), 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+}
+
+/* ---------------- Shared bits ---------------- */
+function backLink(href, label, inline) {
+  return '<div class="back"' + (inline ? ' style="position:static"' : '') + '><a href="' + href + '">' + ICON.back + esc(label) + '</a></div>';
+}
+function notFound(what) {
+  return '<div class="panel empty" style="margin-top:24px">' + esc(what) + ' isn’t in the Grimoire anymore.<br><a class="btn" href="#/home">Go home</a></div>';
+}
+
+function filterSheet() {
+  const seasons = Engine.seasons(S.data);
+  return '<h2 id="sheet-title">What to show</h2><h3>Season</h3><div class="chips">' + seasons.map(s =>
+    '<button class="chip" data-act="set-season" data-v="' + esc(s.id) + '" aria-pressed="' + (S.filter.season === s.id) + '">' + esc(s.label) + '</button>').join('') + '</div>' +
+    '<h3>Group</h3><div class="chips"><button class="chip" data-act="set-group" data-v="all" aria-pressed="' + (S.filter.group === 'all') + '">All groups</button>' +
+    S.data.groups.map((g, i) => '<button class="chip" data-act="set-group" data-v="' + i + '" aria-pressed="' + (String(S.filter.group) === String(i)) + '">' + esc(g.n) + '</button>').join('') + '</div>' +
+    '<button class="btn block" style="margin-top:22px" data-act="close">Done</button>';
+}
+
+function accountSheet() {
+  const mi = meIndex();
+  const synced = S.data ? new Date(S.data.savedAtIso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+  return '<h2 id="sheet-title">' + (mi >= 0 ? esc(player(mi).n) : 'Just looking') + '</h2>' +
+    (mi >= 0 ? '<a class="btn block" href="#/player/' + enc(S.me) + '">Open my profile</a><div style="height:10px"></div>' : '') +
+    (TOKEN()
+      ? (mi < 0 ? '<button class="btn block" data-act="switch">Pick my player</button><div style="height:10px"></div>' : '') +
+        '<p class="muted" style="font-size:14px;margin:0 0 12px">Signed in with Discord' + (CHOIR.name() ? ' as ' + esc(CHOIR.name()) : '') + '.' + (mi >= 0 ? ' Wrong player? Ask your organizer to release it.' : '') + '</p>'
+      : '<button class="btn block" data-act="switch">' + (mi >= 0 ? 'I’m someone else' : 'Pick my name') + '</button><div style="height:10px"></div>') +
+    '<button class="btn block" data-act="reload">Check for new battles</button>' +
+    '<p class="muted" style="font-size:14px;margin-top:16px">Battles come from Playgroup.gg and update each time your organizer syncs. Last sync ' + esc(synced) + '.</p>' +
+    '<p class="muted" style="font-size:14px">App ' + APP_VERSION + ', server ' + esc(S.server || 'not reached yet') + '.</p>' +
+    '<p class="muted" style="font-size:12px">Commander art from Scryfall. Commander Grimoire is unofficial Fan Content permitted under the Fan Content Policy. Not approved or endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.</p>' +
+    '<button class="link-btn" data-act="signout" style="margin-top:6px">Sign out of this phone</button>';
+}
+
+function storySheet(gameId) {
+  const mine = S.live.stories.find(s => s.gameId === String(gameId) && s.by === player(meIndex()).n) || {};
+  return '<h2 id="sheet-title">Tell the story</h2><form data-form="story"><input type="hidden" name="gameId" value="' + esc(gameId) + '">' +
+    '<label class="field"><span>What happened?</span><textarea class="input" name="summary" maxlength="500" placeholder="Held up a counterspell for four turns…">' + esc(mine.summary || '') + '</textarea></label>' +
+    '<label class="field"><span>Card of the game</span><input class="input" name="mvp" maxlength="120" value="' + esc(mine.mvp || '') + '"></label>' +
+    '<label class="field"><span>The moment everyone will remember</span><input class="input" name="moment" maxlength="300" value="' + esc(mine.moment || '') + '"></label>' +
+    '<button class="btn primary block" type="submit">Save story</button></form>';
+}
+
+/* ---------------- Events ---------------- */
+const actions = {
+  home: () => { location.hash = '#/home'; },
+  filters: () => openSheet(filterSheet()),
+  account: () => openSheet(accountSheet()),
+  close: () => closeSheet(),
+  'set-season': el => { S.filter.season = el.dataset.v; store.set('filter', S.filter); openSheet(filterSheet()); render(); },
+  'set-group': el => { S.filter.group = el.dataset.v; store.set('filter', S.filter); openSheet(filterSheet()); render(); },
+  sort: el => { S.ui.sort = el.dataset.v; saveUi(); render(); },
+  'deck-sort': el => { S.ui.deckSort = el.dataset.v; saveUi(); render(); },
+  color: el => { const c = el.dataset.c; S.ui.colors = S.ui.colors.includes(c) ? S.ui.colors.filter(x => x !== c) : S.ui.colors.concat(c); saveUi(); render(); },
+  mine: () => { S.ui.mine = !S.ui.mine; saveUi(); render(); },
+  'choose-me': async el => {
+    if (TOKEN()) {
+      el.disabled = true;
+      const out = await api('appLinkMe', { player: el.dataset.key });
+      el.disabled = false;
+      if (out.auth) { signOut(out.error); return; }
+      if (!out.ok) { toast(out.offline ? 'No connection. Try again when you have signal.' : out.error); return; }
+      applyLive(out.data.live);
+    }
+    S.me = el.dataset.key; store.set('me', S.me); S.gate = ''; location.hash = '#/home'; render();
+  },
+  browse: () => { S.gate = 'browse'; render(); },
+  switch: () => { closeSheet(); S.me = ''; store.del('me'); S.gate = ''; render(); },
+  reload: async () => { closeSheet(); toast('Checking…'); if (await refresh()) toast('Up to date.'); },
+  signout: () => { closeSheet(); store.del('me'); S.me = ''; if (TOKEN()) CHOIR.signOut(); else signOut(''); },
+  rsvp: el => {
+    const status = myRsvp(el.dataset.night) === el.dataset.v ? '' : el.dataset.v;
+    send('appRsvp', { me: S.me, nightId: el.dataset.night, status }, status === 'in' ? 'You’re in.' : status === 'maybe' ? 'Marked as maybe.' : status === 'out' ? 'Marked as can’t go.' : 'Answer cleared.');
+  },
+  'new-night': () => { if (!S.me) { toast('Pick your name first.'); return; } openSheet(nightForm(null)); },
+  'edit-night': el => openSheet(nightForm(S.live.nights.find(n => n.id === el.dataset.night))),
+  'cancel-night': el => { if (confirmInline(el, 'Tap again to cancel this night')) send('appCancelNight', { me: S.me, nightId: el.dataset.night }, 'Game night cancelled.'); },
+  'pod-size': el => { S.ui.podSize = +el.dataset.v; saveUi(); render(); },
+  pods: async el => {
+    el.disabled = true; el.textContent = 'Shuffling the tables…';
+    const out = await api('appMakePods', { me: S.me, nightId: el.dataset.night, podSize: S.ui.podSize || 4 });
+    if (out.ok) { applyLive(out.data); toast('Pods are ready.'); } else toast(out.offline ? 'Pods need a connection. Try again in a moment.' : out.error);
+    render();
+  },
+  story: el => openSheet(storySheet(el.dataset.game)),
+  ics: el => {
+    const n = S.live.nights.find(x => x.id === el.dataset.night);
+    const url = URL.createObjectURL(new Blob([icsFor(n)], { type: 'text/calendar' }));
+    const a = document.createElement('a'); a.href = url; a.download = 'game-night.ics'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  },
+  share: async el => {
+    const n = S.live.nights.find(x => x.id === el.dataset.night);
+    const url = location.href.split('#')[0].split('?')[0] + '#/night/' + n.id;
+    const text = n.title + ', ' + nightWhen(n, true) + (n.place ? ' at ' + n.place : '');
+    if (navigator.share) { try { await navigator.share({ title: n.title, text, url }); } catch (e) {} }
+    else if (navigator.clipboard) { await navigator.clipboard.writeText(text + '\n' + url); toast('Link copied.'); }
+  }
+};
+function saveUi() { store.set('ui', S.ui); }
+
+function confirmInline(el, message) {
+  if (el.dataset.armed) return true;
+  el.dataset.armed = '1';
+  const original = el.textContent;
+  el.textContent = message;
+  setTimeout(() => { if (el.isConnected) { el.textContent = original; delete el.dataset.armed; } }, 4000);
+  return false;
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = actions[el.dataset.act];
+  if (!fn) return;
+  e.preventDefault();
+  fn(el);
+});
+
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.input) {
+    S.ui[el.dataset.input] = el.value;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => {
+      saveUi();
+      // Redraw results without stealing the keyboard.
+      const pos = el.selectionStart;
+      const id = el.dataset.input;
+      el.blur();
+      render();
+      const again = document.querySelector('[data-input="' + id + '"]');
+      if (again) { again.focus({ preventScroll: true }); try { again.setSelectionRange(pos, pos); } catch (err) {} }
+    }, 250);
+  }
+  if (el.dataset.filterList) {
+    const q = el.value.toLowerCase();
+    document.querySelectorAll('#' + el.dataset.filterList + ' li').forEach(li => { li.hidden = q && !li.dataset.name.includes(q); });
+  }
+});
+
+document.addEventListener('submit', async e => {
+  const form = e.target.closest('form[data-form]');
+  if (!form) return;
+  e.preventDefault();
+  const v = Object.fromEntries(new FormData(form).entries());
+  const kind = form.dataset.form;
+  if (kind === 'pass') {
+    S.pass = String(v.pass || '').trim();
+    S.gateError = '';
+    const button = form.querySelector('button');
+    button.disabled = true; button.textContent = 'Opening…';
+    const out = await api('appData', { me: S.me });
+    if (out.ok) {
+      store.set('pass', S.pass);
+      S.data = out.data.dataset; store.set('data', S.data);
+      S.server = out.build || ''; store.set('server', S.server);
+      applyLive(out.data.live);
+      S.syncedAt = Date.now(); store.set('syncedAt', S.syncedAt);
+      render();
+    } else {
+      S.pass = '';
+      S.gateError = out.offline ? 'The Grimoire could not be reached. Check your connection.' : out.error;
+      render();
+    }
+  } else if (kind === 'night') {
+    const start = new Date(v.date + 'T' + v.time);
+    if (Number.isNaN(start.getTime())) { toast('Choose a date and time.'); return; }
+    const existing = S.live.nights.some(n => n.id === v.id);
+    closeSheet();
+    send('appSaveNight', { me: S.me, night: { id: v.id, startsAt: start.toISOString(), title: v.title, place: v.place, host: v.host, seats: +v.seats || 8, notes: v.notes } },
+      existing ? 'Changes saved.' : 'Game night scheduled. Discord has been told.');
+    location.hash = '#/night/' + v.id;
+  } else if (kind === 'story') {
+    if (!String(v.summary || v.moment || v.mvp).trim()) { toast('Write a line about the battle first.'); return; }
+    closeSheet();
+    send('appSaveStory', { me: S.me, gameId: v.gameId, summary: v.summary, mvp: v.mvp, moment: v.moment }, 'Story saved.');
+  }
+});
+
+/* ---------------- Start ---------------- */
+if ('serviceWorker' in navigator && !DEMO && location.protocol === 'https:') {
+  navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(() => {});
+}
+render();
+if (authed()) { refresh(true).then(() => flush()); }
+setInterval(() => { if (document.visibilityState === 'visible' && authed()) refresh(true); }, 5 * 60000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && authed() && Date.now() - S.syncedAt > 60000) refresh(true); });
+</script>
+</body>
+</html>
