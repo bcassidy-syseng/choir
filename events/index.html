@@ -115,6 +115,9 @@ textarea.input { min-height: 90px; resize: vertical; }
 .people label { display: flex; align-items: center; gap: 8px; min-height: 40px; }
 .people input { width: 20px; height: 20px; accent-color: var(--accent); }
 .people small { color: var(--cb-muted); }
+.guestrow { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) 44px; gap: 8px; margin-bottom: 8px; }
+.guestrow .input { min-height: 44px; }
+.iconbtn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--cb-line-hi); background: transparent; color: var(--cb-muted); font-size: 22px; line-height: 1; cursor: pointer; }
 .err { color: var(--no); min-height: 1.4em; margin: 6px 0 10px; }
 .cal { padding: 16px; margin-top: 26px; }
 .cal p { margin: 0 0 12px; }
@@ -271,9 +274,13 @@ function viewEvent(id) {
   const ev = S.data.events.find(e => e.id === id);
   if (!ev) return '<h1>Events</h1><div class="panel empty"><p>That event isn’t here. It may be invite-only, or it was removed.</p><a class="btn" href="#/">All events</a></div>';
   const a = myAnswer(ev), host = isHost(ev), off = ev.status === 'cancelled', live = upcoming(ev) && !off;
-  const list = st => ev.rsvps.filter(r => r.status === st).map(r => '<li>' + esc(r.name) + (r.player === ev.createdBy ? ' <small class="muted">host</small>' : '') + '</li>').join('') || '<li class="muted">Nobody yet</li>';
-  const invited = ev.invite === 'all' ? 'Everyone in the group' : ev.invite.map(nameOf).join(', ');
-  const waiting = ev.invite === 'all' ? [] : ev.invite.filter(k => !ev.rsvps.some(r => r.player === k));
+  const guests = ev.guests || [];
+  const list = st => (ev.rsvps.filter(r => r.status === st).map(r => '<li>' + esc(r.name) + (r.player === ev.createdBy ? ' <small class="muted">host</small>' : '') + '</li>')
+    .concat(guests.filter(g => g.status === st).map(g => '<li>' + esc(g.name) + ' <small class="muted">by email</small></li>'))).join('') || '<li class="muted">Nobody yet</li>';
+  const invited = (ev.invite === 'all' ? 'Everyone in the group' : ev.invite.map(nameOf).join(', ')) +
+    ((ev.guests || []).length ? ', plus ' + ev.guests.length + ' by email' : '');
+  const waiting = (ev.invite === 'all' ? [] : ev.invite.filter(k => !ev.rsvps.some(r => r.player === k)).map(nameOf))
+    .concat(guests.filter(g => !g.status).map(g => g.name + ' (by email)'));
   let h = '<p style="margin:16px 0 0"><a href="#/">‹ All events</a></p><h1>' + esc(ev.title) + '</h1>' +
     '<p class="sub">' + (off ? '<b style="color:var(--no)">Cancelled.</b> ' : '') + (ev.kind === 'game_night' ? 'Game night' : 'Event') + (ev.invite !== 'all' ? ' · invite only' : '') + '</p>';
   if (live && !host) {
@@ -287,9 +294,10 @@ function viewEvent(id) {
     (ev.notes ? ICON.note + '<p style="white-space:pre-line">' + esc(ev.notes) + '</p>' : '') + '</div>';
   h += '<div class="who"><div class="panel"><h4>Going</h4><ul>' + list('in') + '</ul></div><div class="panel"><h4>Maybe</h4><ul>' + list('maybe') + '</ul></div>' +
     '<div class="panel"><h4>Can’t go</h4><ul>' + list('out') + '</ul></div>' +
-    (waiting.length ? '<div class="panel"><h4>Haven’t answered</h4><ul>' + waiting.map(k => '<li>' + esc(nameOf(k)) + '</li>').join('') + '</ul></div>' : '') + '</div>';
+    (waiting.length ? '<div class="panel"><h4>Haven’t answered</h4><ul>' + waiting.map(n => '<li>' + esc(n) + '</li>').join('') + '</ul></div>' : '') + '</div>';
   h += '<div class="actions">';
   if (!off) h += '<a class="btn primary" href="' + esc(googleLink(ev)) + '" target="_blank" rel="noopener">Add to Google Calendar</a>';
+  if (host && (ev.guests || []).length) h += '<p class="muted" style="font-size:14px;margin:4px 0 0">Email guests (only you see addresses): ' + ev.guests.map(g => esc(g.name) + ' &lt;' + esc(g.email) + '&gt;').join(', ') + '</p>';
   if (host && live) h += '<a class="btn" href="#/edit/' + esc(ev.id) + '">Edit event</a><button class="btn danger" data-act="cancel" data-id="' + esc(ev.id) + '">Cancel event</button>';
   h += '</div>';
   return h;
@@ -317,11 +325,21 @@ function viewForm(id) {
     '<div class="seg" role="radiogroup" aria-label="Who is invited"><label><input type="radio" name="who" value="all"' + (everyone ? ' checked' : '') + '><span>Everyone</span></label>' +
     '<label><input type="radio" name="who" value="some"' + (everyone ? '' : ' checked') + '><span>Choose people</span></label></div>' +
     '<fieldset class="panel people" id="people"' + (everyone ? ' hidden' : '') + '><legend class="muted" style="font-size:14px;padding:0 4px">Invite</legend>' +
+    '<p class="muted" style="grid-column:1/-1;margin:0 0 4px;font-size:14px">Everyone in the Discord server is listed. People not on Nexus yet see the invite once they open it.</p>' +
     (people.length ? '' : '<p class="muted" style="grid-column:1/-1;margin:0">Nobody else is on the list yet.</p>') +
     people.map(p => '<label><input type="checkbox" name="invite" value="' + esc(p.k) + '"' + (chosen.includes(p.k) ? ' checked' : '') + '>' + esc(p.n) + (p.linked ? '' : ' <small>(not on Nexus yet)</small>') + '</label>').join('') + '</fieldset>' +
-    '<p class="muted" style="font-size:14px;margin:-4px 0 12px">Everyone in the Discord server is listed. People not on Nexus yet see the invite once they open it.</p>' +
+    '<span class="field" style="margin:18px 0 8px"><span>Invite by email</span></span>' +
+    '<div id="guests">' + (ev && ev.guests && ev.guests.length ? ev.guests : [{ name: '', email: '' }]).map(guestRow).join('') + '</div>' +
+    '<button type="button" class="btn" data-act="addguest" style="min-height:40px;margin-bottom:6px">+ Add another email</button>' +
+    '<p class="muted" style="font-size:14px;margin:4px 0 16px">They get an email with a link to answer and a calendar file. No Discord needed.</p>' +
     '<p class="err" id="formerr" role="alert"></p>' +
     '<button class="btn primary block" type="submit">' + (ev ? 'Save changes' : 'Create and invite') + '</button></form>';
+}
+
+function guestRow(g) {
+  return '<div class="guestrow"><input class="input" name="gname" maxlength="60" placeholder="Name" aria-label="Guest name" value="' + esc(g.name || '') + '">' +
+    '<input class="input" type="email" name="gemail" maxlength="120" placeholder="email@example.com" aria-label="Guest email" autocomplete="off" value="' + esc(g.email || '') + '">' +
+    '<button type="button" class="iconbtn" data-act="dropguest" aria-label="Remove this email guest">×</button></div>';
 }
 
 function wireForm(form) {
@@ -343,9 +361,12 @@ function wireForm(form) {
     const err = form.querySelector('#formerr'), btn = form.querySelector('button[type="submit"]');
     if (!f('start').value) { err.textContent = 'Choose when it starts.'; return; }
     const invite = f('who').value === 'all' ? 'all' : Array.from(form.querySelectorAll('input[name="invite"]:checked')).map(i => i.value);
-    if (invite !== 'all' && !invite.length) { err.textContent = 'Invite at least one person, or choose Everyone.'; return; }
+    const guests = Array.from(form.querySelectorAll('.guestrow')).map(r => ({ name: r.querySelector('[name=gname]').value.trim(), email: r.querySelector('[name=gemail]').value.trim() })).filter(g => g.email);
+    const badEmail = guests.find(g => !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(g.email));
+    if (badEmail) { err.textContent = badEmail.email + ' doesn’t look like an email address.'; return; }
+    if (invite !== 'all' && !invite.length && !guests.length) { err.textContent = 'Invite at least one person, or choose Everyone.'; return; }
     const event = { id: f('eid').value, kind: f('kind').value, title: f('title').value, startsAt: new Date(f('start').value).toISOString(),
-      endsAt: f('end').value ? new Date(f('end').value).toISOString() : '', place: f('place').value, notes: f('notes').value, seats: Number(f('seats').value) || 8, invite };
+      endsAt: f('end').value ? new Date(f('end').value).toISOString() : '', place: f('place').value, notes: f('notes').value, seats: Number(f('seats').value) || 8, invite: invite !== 'all' && !invite.length ? [] : invite, guests };
     btn.disabled = true; btn.textContent = 'Saving…'; err.textContent = '';
     const out = await api('evSave', { event });
     if (!out.ok) { btn.disabled = false; btn.textContent = 'Try again'; err.textContent = out.error; return; }
@@ -374,6 +395,8 @@ const actions = {
     if (out.ok) { keep(out.data); toast('Event cancelled. Everyone invited will hear about it.'); } else toast(out.error);
     render();
   },
+  addguest: () => { const box = document.getElementById('guests'); box.insertAdjacentHTML('beforeend', guestRow({})); box.lastElementChild.querySelector('[name=gname]').focus(); },
+  dropguest: el => { const row = el.closest('.guestrow'), box = row.parentNode; if (box.children.length > 1) row.remove(); else row.querySelectorAll('input').forEach(i => { i.value = ''; }); },
   copyfeed: async el => {
     try { await navigator.clipboard.writeText(S.data.feedUrl); el.textContent = 'Copied'; }
     catch (e) { prompt('Copy your calendar address:', S.data.feedUrl); }

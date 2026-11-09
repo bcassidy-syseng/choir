@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a130b">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>You’re invited · Nexus Events</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IM+Fell+English&display=swap" rel="stylesheet">
+<style>
+/* The page an email guest opens from their invite. No sign-in: the private key in the link is the invite. */
+:root {
+  --frame: #1a130b; --frame-2: #251b10; --frame-3: #33261a; --line: #4d3a22; --line-hi: #7a5c34;
+  --parch: #f1e5cc; --muted: #c4b08c; --accent: #9d95ec; --accent-hi: #c9c4fa; --on-accent: #15112e;
+  --ok: #8fcf7a; --warn: #f0c36a; --no: #f6b3a5;
+  --serif: 'IM Fell English', 'Iowan Old Style', Palatino, Georgia, serif;
+  --sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+html { background: var(--frame); }
+body { margin: 0; color: var(--parch); font: 16px/1.45 var(--sans); -webkit-font-smoothing: antialiased; min-height: 100vh;
+  background: radial-gradient(42% 28% at 18% 12%, rgba(130, 98, 56, .2), transparent 70%), radial-gradient(36% 24% at 84% 34%, rgba(96, 70, 38, .22), transparent 70%), var(--frame); }
+a { color: var(--accent-hi); }
+:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; border-radius: 6px; }
+main { max-width: 560px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 28px) 18px 48px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--muted); font: 20px/1 var(--serif); margin-bottom: 22px; }
+.brand img { width: 32px; height: 32px; border-radius: 8px; }
+h1 { font: 34px/1.1 var(--serif); font-weight: 400; margin: 0 0 6px; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+.panel { background: var(--frame-2); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 14px 0; }
+.facts p { margin: 0 0 8px; } .facts p:last-child { margin: 0; }
+.facts b { color: var(--accent-hi); font-weight: 700; margin-right: 6px; }
+.answer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px 0 6px; }
+.answer button { min-height: 52px; border-radius: 12px; border: 1px solid var(--line-hi); background: transparent; color: var(--parch); font: 700 16px/1 var(--sans); cursor: pointer; }
+.answer button[aria-pressed="true"].in { background: #2f4a27; border-color: var(--ok); color: #dff5d6; }
+.answer button[aria-pressed="true"].maybe { background: #4d3d1c; border-color: var(--warn); color: #fbecc8; }
+.answer button[aria-pressed="true"].out { background: #4a2a24; border-color: var(--no); color: #fde0d9; }
+.answer button:disabled { opacity: .6; }
+.status { min-height: 1.4em; color: var(--muted); margin: 6px 0 0; }
+.btn { display: flex; align-items: center; justify-content: center; min-height: 50px; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-weight: 700; text-decoration: none; margin-top: 14px; }
+.who h2 { font: 20px/1.2 var(--serif); font-weight: 400; margin: 0 0 8px; }
+.who ul { margin: 0; padding-left: 18px; }
+.off { color: var(--no); font-weight: 700; }
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"><p class="sub">Opening your invite…</p></main>
+<script>
+'use strict';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzRxrwszrFzKXxiGEg58Y8numLLLX-YUAfTI-H2_SPOT9K-u_AxTKl0C9X6GzVJ0Y8A/exec';
+const KEY = location.hash.replace(/^#/, '');
+const app = document.getElementById('app');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ANSWERS = { in: 'Going', maybe: 'Maybe', out: 'Can’t go' };
+let D = null;
+
+async function api(fn, args) {
+  try {
+    const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }), redirect: 'follow' });
+    return await res.json();
+  } catch (e) { return { ok: false, error: 'This page couldn’t reach the server. Check your connection and try again.' }; }
+}
+function timeRange(ev) {
+  const s = new Date(ev.startsAt), e = ev.endsAt ? new Date(ev.endsAt) : null;
+  const t = d => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  const day = s.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  return day + ', ' + t(s) + (e ? (s.toDateString() === e.toDateString() ? ' – ' + t(e) : ' to ' + e.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })) : '');
+}
+function gcal(ev) {
+  const stamp = iso => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const end = ev.endsAt || new Date(new Date(ev.startsAt).getTime() + 4 * 3600000).toISOString();
+  return 'https://calendar.google.com/calendar/render?' + new URLSearchParams({ action: 'TEMPLATE', text: ev.title, dates: stamp(ev.startsAt) + '/' + stamp(end),
+    details: (ev.notes ? ev.notes + '\n\n' : '') + 'Your invite: ' + location.href, location: ev.place || '' });
+}
+function render(note) {
+  const ev = D.event, mine = D.guest.status, off = ev.status === 'cancelled';
+  const past = new Date(ev.endsAt || ev.startsAt).getTime() < Date.now() - 4 * 3600000;
+  const list = st => ev.answers.filter(a => a.status === st).map(a => '<li>' + esc(a.name) + '</li>').join('') || '<li style="color:var(--muted)">Nobody yet</li>';
+  app.innerHTML = '<div class="brand"><img src="icon-192.png" alt="">Nexus Events</div>' +
+    '<p class="sub">' + esc(ev.hostName) + ' invited ' + esc(D.guest.name || 'you') + ' to</p><h1>' + esc(ev.title) + '</h1>' +
+    (off ? '<p class="off">This event was cancelled.</p>' : '') +
+    '<div class="panel facts"><p><b>When</b>' + esc(timeRange(ev)) + '</p>' + (ev.place ? '<p><b>Where</b>' + esc(ev.place) + '</p>' : '') +
+    (ev.notes ? '<p style="white-space:pre-line"><b>Notes</b>' + esc(ev.notes) + '</p>' : '') + '</div>' +
+    (off || past ? '' : '<div class="answer" role="group" aria-label="Your answer">' + ['in', 'maybe', 'out'].map(s =>
+      '<button class="' + s + '" data-v="' + s + '" aria-pressed="' + (mine === s) + '">' + ANSWERS[s] + '</button>').join('') + '</div>' +
+      '<p class="status" role="status">' + esc(note || (mine ? 'You answered ' + ANSWERS[mine] + '. Tap again to change it.' : 'Let ' + ev.hostName + ' know if you can make it.')) + '</p>' +
+      '<a class="btn" href="' + esc(gcal(ev)) + '" target="_blank" rel="noopener">Add to Google Calendar</a>') +
+    '<div class="panel who"><h2>Going</h2><ul>' + list('in') + '</ul><h2 style="margin-top:12px">Maybe</h2><ul>' + list('maybe') + '</ul></div>' +
+    '<p style="color:var(--muted);font-size:14px">This page is only for you. Keep the link to come back later.</p>';
+  app.querySelectorAll('[data-v]').forEach(b => b.onclick = async () => {
+    const status = mine === b.dataset.v ? '' : b.dataset.v;
+    app.querySelectorAll('[data-v]').forEach(x => { x.disabled = true; });
+    const out = await api('gsRsvp', { key: KEY, status });
+    if (out.ok) { D = out.data; render(status ? 'Thanks! You answered ' + ANSWERS[status] + '.' : 'Answer cleared.'); }
+    else render(out.error);
+  });
+}
+(async () => {
+  if (!/^[0-9a-f]{40}$/.test(KEY)) { app.innerHTML = '<h1>Invite not found</h1><p class="sub">Open the link from your invite email again.</p>'; return; }
+  const out = await api('gsData', { key: KEY });
+  if (!out.ok) { app.innerHTML = '<h1>Invite not found</h1><p class="sub">' + esc(out.error) + '</p>'; return; }
+  D = out.data; render();
+})();
+</script>
+</body>
+</html>
