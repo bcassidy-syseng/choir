@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#1a130b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Choir">
-<title>Grimoire · Choir</title>
+<meta name="apple-mobile-web-app-title" content="Nexus">
+<title>Grimoire · Nexus</title>
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
@@ -845,7 +845,7 @@ function render() {
 function topBar() {
   const mi = meIndex();
   return '<header class="top">' + (window.CHOIR && !DEMO
-      ? '<a class="brand" href="' + esc(CHOIR.hubUrl) + '" aria-label="Grimoire. Switch to another part of Choir">' + SIGIL + '<span>Grimoire</span>' + ICON.swap + '</a>'
+      ? '<a class="brand" href="' + esc(CHOIR.hubUrl) + '" aria-label="Grimoire. Switch to another part of Nexus">' + SIGIL + '<span>Grimoire</span>' + ICON.swap + '</a>'
       : '<button class="brand" data-act="home" aria-label="Commander Grimoire home">' + SIGIL + '<span>Grimoire</span></button>') +
     (DEMO ? '<span class="demo-note">Demo</span>' : '') +
     '<button class="filter-pill" data-act="filters" aria-label="Change season and group. Now showing ' + esc(filterLabel()) + '">' + esc(filterLabel()) + ICON.down + '</button>' +

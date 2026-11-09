@@ -4,11 +4,11 @@
 <base target="_top">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MagicCon Detroit · Choir</title>
+<title>MagicCon Detroit · Nexus</title>
 <meta name="theme-color" content="#1a130b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Choir">
+<meta name="apple-mobile-web-app-title" content="Nexus">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -766,7 +766,7 @@ function renderApp(){
   $('#app').innerHTML =
     '<div class="top"><div class="wrap">'
     + (TOKEN() || (window.CHOIR && BOOT.mode === 'web')
-        ? '<a class="brand" href="'+esc(CHOIR.hubUrl)+'" aria-label="MagicCon Detroit. Switch to another part of Choir"><img class="brandlogo" src="'+LOGO+'" alt=""><div>MagicCon Detroit<small>Feb 26–28 · group planner</small></div>'+ICON.swap+'</a>'
+        ? '<a class="brand" href="'+esc(CHOIR.hubUrl)+'" aria-label="MagicCon Detroit. Switch to another part of Nexus"><img class="brandlogo" src="'+LOGO+'" alt=""><div>MagicCon Detroit<small>Feb 26–28 · group planner</small></div>'+ICON.swap+'</a>'
         : '<div class="brand"><img class="brandlogo" src="'+LOGO+'" alt=""><div>MagicCon Detroit<small>Feb 26–28 · group planner</small></div></div>')
     + '<nav class="tabs-top">'+tabs.map(t=>tabBtn(t,true)).join('')+'</nav><span class="sync" id="sync"></span>'
     + '<button class="mebtn" id="me">'+avatar(S.me,30)+'<span>'+esc(S.me)+'</span></button></div></div>'
