@@ -317,9 +317,9 @@ function viewForm(id) {
     '<div class="seg" role="radiogroup" aria-label="Who is invited"><label><input type="radio" name="who" value="all"' + (everyone ? ' checked' : '') + '><span>Everyone</span></label>' +
     '<label><input type="radio" name="who" value="some"' + (everyone ? '' : ' checked') + '><span>Choose people</span></label></div>' +
     '<fieldset class="panel people" id="people"' + (everyone ? ' hidden' : '') + '><legend class="muted" style="font-size:14px;padding:0 4px">Invite</legend>' +
-    (people.length ? '' : '<p class="muted" style="grid-column:1/-1;margin:0">Nobody else has opened Events yet.</p>') +
-    people.map(p => '<label><input type="checkbox" name="invite" value="' + esc(p.k) + '"' + (chosen.includes(p.k) ? ' checked' : '') + '>' + esc(p.n) + '</label>').join('') + '</fieldset>' +
-    '<p class="muted" style="font-size:14px;margin:-4px 0 12px">People show up here once they’ve opened Events. Everyone includes anyone who opens it later.</p>' +
+    (people.length ? '' : '<p class="muted" style="grid-column:1/-1;margin:0">Nobody else is on the list yet.</p>') +
+    people.map(p => '<label><input type="checkbox" name="invite" value="' + esc(p.k) + '"' + (chosen.includes(p.k) ? ' checked' : '') + '>' + esc(p.n) + (p.linked ? '' : ' <small>(not on Nexus yet)</small>') + '</label>').join('') + '</fieldset>' +
+    '<p class="muted" style="font-size:14px;margin:-4px 0 12px">Everyone in the Discord server is listed. People not on Nexus yet see the invite once they open it.</p>' +
     '<p class="err" id="formerr" role="alert"></p>' +
     '<button class="btn primary block" type="submit">' + (ev ? 'Save changes' : 'Create and invite') + '</button></form>';
 }
