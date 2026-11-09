@@ -269,7 +269,7 @@ function ticker(el) {
     setTimeout(() => { el.innerHTML = '<b>' + esc(l.t) + '</b>' + esc(l.x); el.classList.remove('fade'); }, el.textContent ? 250 : 0);
   };
   show();
-  if (lines.length > 1) tickerTimer = setInterval(show, 3600);
+  if (lines.length > 1) tickerTimer = setInterval(show, 7200);
 }
 
 (function start() {
