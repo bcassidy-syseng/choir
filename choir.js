@@ -8,13 +8,34 @@
   const set = (key, value) => {
     try { if (value) localStorage.setItem('choir_' + key, value); else localStorage.removeItem('choir_' + key); } catch (e) { /* private mode: sign-in lasts this visit */ }
   };
+  /* Each person's saved copies and waiting changes (Grimoire cg_, MagicCon mc_, Events ev_).
+     Cleared on sign-out and when a different Discord account signs in on this device, so
+     the next person never sees someone else's data or sends their queued changes. */
+  const PERSONAL = /^(cg_|mc_|ev_|choir_noaccess_|choir_last$|choir_art_last$)/;
+  function clearPersonal() {
+    try { Object.keys(localStorage).filter(k => PERSONAL.test(k)).forEach(k => localStorage.removeItem(k)); } catch (e) { /* storage blocked */ }
+    try { if (window.indexedDB) indexedDB.deleteDatabase('nexus-grimoire'); } catch (e) { /* not supported */ }
+  }
+  /** The Discord account a token belongs to (read only; the servers check the signature). */
+  function userOf(token) {
+    try {
+      const body = String(token || '').split('.')[1] || '';
+      return String(JSON.parse(atob(body.replace(/-/g, '+').replace(/_/g, '/'))).u || '');
+    } catch (e) { return ''; }
+  }
+  if (get('token') && !get('uid')) set('uid', userOf(get('token')));
+
   window.CHOIR = {
     root: root,
     token: () => get('token'),
     name: () => get('name'),
-    signIn(token, name) { set('token', token); set('name', name || ''); },
-    /** Clears the sign-in everywhere and returns to the front page. */
-    signOut(reason) { set('token', ''); set('name', ''); location.href = root + (reason ? '#signed-out' : ''); },
+    signIn(token, name) {
+      const uid = userOf(token);
+      if (get('uid') && uid && get('uid') !== uid) clearPersonal();
+      set('token', token); set('name', name || ''); set('uid', uid);
+    },
+    /** Clears the sign-in and this person's saved data everywhere, and returns to the front page. */
+    signOut(reason) { clearPersonal(); set('token', ''); set('name', ''); set('uid', ''); location.href = root + (reason ? '#signed-out' : ''); },
     /** Opens the front page to switch sections. */
     hubUrl: root + '?switch',
     remember(section) { set('last', section); },

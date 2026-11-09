@@ -438,11 +438,38 @@ const store = {
   del(key) { try { localStorage.removeItem(PREFIX + key); } catch (e) {} }
 };
 
+/* The full battle data is too big for the phone's small storage, so it lives in
+   IndexedDB. Without it Grimoire re-downloaded everything on every open.
+   (Nexus sign-out deletes this database: choir.js clearPersonal.) */
+const bigStore = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((resolve, reject) => {
+    if (!window.indexedDB) { reject(new Error('no IndexedDB')); return; }
+    const req = indexedDB.open('nexus-grimoire', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('kv');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  }));
+  const run = (mode, fn) => open().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('kv', mode), req = fn(tx.objectStore('kv'));
+    tx.oncomplete = () => resolve(req && req.result);
+    tx.onerror = tx.onabort = () => reject(tx.error);
+  }));
+  return {
+    get: key => run('readonly', s => s.get(PREFIX + key)).catch(() => null),
+    set: (key, value) => run('readwrite', s => s.put(value, PREFIX + key)).catch(() => {})
+  };
+})();
+function saveData(data) {
+  bigStore.set('data', data);
+  store.del('data'); // older copies were kept in the small storage
+}
+
 /* ---------------- State ---------------- */
 const S = {
   pass: store.get('pass', DEMO ? 'demo' : ''),
   me: store.get('me', ''),
-  data: store.get('data', null),
+  data: store.get('data', null), // older versions; the real copy loads from IndexedDB at start
   live: store.get('live', { nights: [], rsvps: [], stories: [] }),
   filter: store.get('filter', { season: 'all', group: 'all' }),
   ui: store.get('ui', { sort: 'wins', deckSort: 'wins', colors: [], mine: false }),
@@ -679,7 +706,7 @@ async function refresh(quiet) {
     const key = out.data.you.player || '';
     if (key !== S.me) { S.me = key; if (key) store.set('me', key); else store.del('me'); }
   }
-  if (out.data.dataset) { S.data = out.data.dataset; store.set('data', S.data); saveArt(S.data); saveArt(S.data); STATS_KEY = ''; }
+  if (out.data.dataset) { S.data = out.data.dataset; saveData(S.data); saveArt(S.data); STATS_KEY = ''; }
   applyLive(out.data.live);
   S.syncedAt = Date.now(); store.set('syncedAt', S.syncedAt); store.set('server', S.server);
   render();
@@ -1547,7 +1574,7 @@ document.addEventListener('submit', async e => {
     const out = await api('appData', { me: S.me });
     if (out.ok) {
       store.set('pass', S.pass);
-      S.data = out.data.dataset; store.set('data', S.data); saveArt(S.data);
+      S.data = out.data.dataset; saveData(S.data); saveArt(S.data);
       S.server = out.build || ''; store.set('server', S.server);
       applyLive(out.data.live);
       S.syncedAt = Date.now(); store.set('syncedAt', S.syncedAt);
@@ -1577,7 +1604,11 @@ if ('serviceWorker' in navigator && !DEMO && location.protocol === 'https:') {
   navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(() => {});
 }
 render();
-if (authed()) { refresh(true).then(() => flush()); }
+// Load the saved battle data first, so the server only sends it again when it changed.
+(S.data ? Promise.resolve(null) : bigStore.get('data')).then(saved => {
+  if (saved && !S.data) { S.data = saved; STATS_KEY = ''; render(); }
+  if (authed()) { refresh(true).then(() => flush()); }
+});
 setInterval(() => { if (document.visibilityState === 'visible' && authed()) refresh(true); }, 5 * 60000);
 if (window.CHOIR && CHOIR.backdrop && !DEMO) CHOIR.backdrop(document.getElementById('root'), '.tabs');
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && authed() && Date.now() - S.syncedAt > 60000) refresh(true); });
