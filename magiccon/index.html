@@ -428,10 +428,14 @@ body {
   .choicegrid button.on{border-color:var(--accent);background:var(--tint);color:var(--accent-hi)}
   .whohead h1{font:34px/1.1 var(--cb-serif);margin:0 0 6px}
   .whohead p{margin:0;color:var(--muted)}
+.splash{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;color:#c4b08c;font:16px/1.4 'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif}
+.splash img{width:168px;height:168px;filter:drop-shadow(0 14px 30px rgba(0,0,0,.55));animation:splash-breathe 2.4s ease-in-out infinite}
+@keyframes splash-breathe{50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.splash img{animation:none}}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading">Loading the MagicCon planner…</div></div>
+<div id="app"><div class="splash" role="status"><img src="../icons/splash.png" alt="" onerror="this.remove()"><p style="margin:0">Opening the MagicCon planner…</p></div></div>
 <div id="modal"></div>
 <div id="toast"></div>
 <script src="../choir.js"></script>

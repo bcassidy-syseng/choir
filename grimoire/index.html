@@ -391,10 +391,14 @@ table.h2h a { color: var(--vellum); text-decoration: none; display: flex; align-
 .pick button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; }
 .pick button small { color: var(--ash); display: block; font-size: 13px; }
 .demo-note { align-self: center; padding: 2px 8px; border-radius: 6px; background: var(--gilt); color: var(--on-gilt); font: 700 11px/1.4 var(--sans); }
+.splash{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;color:#c4b08c;font:16px/1.4 'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif}
+.splash img{width:168px;height:168px;filter:drop-shadow(0 14px 30px rgba(0,0,0,.55));animation:splash-breathe 2.4s ease-in-out infinite}
+@keyframes splash-breathe{50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.splash img{animation:none}}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root"><div class="splash" role="status"><img src="../icons/splash.png" alt=""><p style="margin:0">Opening the Grimoire…</p></div></div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -858,7 +862,7 @@ function offlineNote() {
 }
 
 function loading() {
-  return '<div class="gate"><div><div class="cb-back"><div class="cb-oval"><div class="sigil">' + SIGIL + '</div><p>Opening the Grimoire…</p></div></div></div></div>';
+  return '<div class="splash" role="status"><img src="../icons/splash.png" alt=""><p style="margin:0">Opening the Grimoire…</p></div>';
 }
 
 /* ---------------- Sign-in ---------------- */

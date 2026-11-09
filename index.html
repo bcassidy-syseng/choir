@@ -99,10 +99,14 @@ code { font: 700 15px/1 var(--cb-sans); background: var(--cb-frame-3); border: 1
 .deck.gm b { color: var(--cb-gold-hi); }
 .deck:active { transform: translateY(1px); }
 [hidden] { display: none !important; }
+.splash{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;color:#c4b08c;font:16px/1.4 'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif}
+.splash img{width:168px;height:168px;filter:drop-shadow(0 14px 30px rgba(0,0,0,.55));animation:splash-breathe 2.4s ease-in-out infinite}
+@keyframes splash-breathe{50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.splash img{animation:none}}
 </style>
 </head>
 <body>
-<main id="root"></main>
+<main id="root"><div class="splash" role="status"><img src="icons/splash.png" alt=""><p style="margin:0">Opening Choir…</p></div></main>
 <script src="choir.js"></script>
 <script>
 'use strict';
