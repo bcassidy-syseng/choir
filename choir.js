@@ -19,7 +19,27 @@
     hubUrl: root + '?switch',
     remember(section) { set('last', section); },
     last: () => get('last'),
-    backdrop: backdrop
+    backdrop: backdrop,
+    /** A section's server said this person may not use it (Discord roles). Covers the page with an explanation. */
+    denied(section, message) {
+      set('noaccess_' + section, message || 'No access');
+      if (document.getElementById('choir-denied')) return;
+      const box = document.createElement('div');
+      box.id = 'choir-denied';
+      box.setAttribute('role', 'alertdialog');
+      box.setAttribute('aria-labelledby', 'choir-denied-title');
+      box.style.cssText = 'position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;background:#1a130b;color:#f1e5cc;font:16px/1.5 "Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;text-align:center';
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      box.innerHTML = '<div style="max-width:420px"><img src="' + root + 'icons/icon-192.png" alt="" style="width:88px;height:88px;border-radius:20px;margin-bottom:14px">' +
+        '<h1 id="choir-denied-title" style="font:32px/1.1 \'IM Fell English\',Georgia,serif;font-weight:400;margin:0 0 10px">No access</h1>' +
+        '<p style="color:#c4b08c;margin:0 0 22px">' + esc(message || 'This part of Nexus isn’t open to you.') + '</p>' +
+        '<a href="' + root + '?switch" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border-radius:12px;background:#dcb462;color:#2a1d05;font-weight:700;text-decoration:none">Back to the App Binder</a></div>';
+      document.body.appendChild(box);
+      const link = box.querySelector('a'); if (link) link.focus();
+    },
+    /** The section's server let this person in: clear any earlier lock. */
+    allowed(section) { set('noaccess_' + section, ''); },
+    noAccess: section => get('noaccess_' + section)
   };
 
   /* ---- Card art in empty space ----

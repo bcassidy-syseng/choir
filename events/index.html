@@ -159,6 +159,8 @@ async function api(fn, args) {
       body: JSON.stringify({ fn, token: TOKEN(), args: args || {} }), signal: controller.signal, redirect: 'follow' });
     const out = await res.json();
     if (out && out.signedOut) { CHOIR.signOut('expired'); return out; }
+    if (out && out.noAccess) CHOIR.denied('events', out.error);
+    else if (out && out.ok) CHOIR.allowed('events');
     return out;
   } catch (e) {
     return { ok: false, offline: true, error: 'Events couldn’t reach the server. Check your signal and try again.' };

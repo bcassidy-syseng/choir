@@ -652,7 +652,11 @@ async function api(fn, args) {
       signal: controller.signal,
       redirect: 'follow'
     });
-    return await res.json();
+    const out = await res.json();
+    // Discord roles decide who may use Grimoire (Nexus access).
+    if (out && out.noAccess && window.CHOIR) CHOIR.denied('grimoire', out.error);
+    else if (out && out.ok && TOKEN() && window.CHOIR) CHOIR.allowed('grimoire');
+    return out;
   } catch (e) {
     return { ok: false, offline: true, error: 'The Grimoire could not be reached.' };
   } finally {

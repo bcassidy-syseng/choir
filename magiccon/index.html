@@ -504,6 +504,7 @@ function api(fn, args, ok, fail, opts){
   S.pending++; renderSync();
   transport(fn, [authPass()].concat(args || [])).then(d => {
     S.pending--; S.offline = false;
+    if (TOKEN() && window.CHOIR && CHOIR.allowed) CHOIR.allowed('magiccon');
     if (opts && opts.raw) { renderSync(); ok && ok(d); return; }   // not app data (e.g. a typed-result suggestion)
     if (d && d.warn) { toast('⚠ ' + d.warn); delete d.warn; }
     if (d) { S.queued = d; }
@@ -520,6 +521,7 @@ function api(fn, args, ok, fail, opts){
       render(); return;
     }
     if (retryable(m) && opts && opts.queue) { queueOut(fn, args); toast('⏳ The sheet is busy. Saved on your phone and it will resend automatically.'); render(); retrySoon(); return; }
+    if (m.indexOf('NO_ACCESS') >= 0 && window.CHOIR) { CHOIR.denied('magiccon', cleanErr(m)); return; }
     if (m.indexOf('SIGNED_OUT') >= 0) {
       if (TOKEN()) { CHOIR.signOut('expired'); return; }
       S.pass=''; store.set('pass',''); S.data=null; S.needPass=true; if (fail) fail(cleanErr(m)); else renderPass(cleanErr(m)); return;

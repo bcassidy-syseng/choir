@@ -122,6 +122,7 @@ code { font: 700 15px/1 var(--cb-sans); background: var(--cb-frame-3); border: 1
 #gm-ticker { transition: opacity .25s ease; }
 #gm-ticker.fade { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { #gm-ticker { transition: none; } }
+.pocket.locked .mtg { filter: grayscale(.85) brightness(.7); }
 .pocket.filled:active .mtg { transform: translateY(-2px); }
 .foot { font-size: 14px; margin: 18px 0 0; }
 .foot .link-btn { font-weight: 700; min-height: 44px; }
@@ -221,12 +222,15 @@ function hubView(message) {
   const days = Math.ceil((CON_DAY - Date.now()) / 86400000);
   const con = days > 1 ? days + ' days to go' : days >= -2 ? 'This weekend' : 'Feb 26–28';
   const name = CHOIR.name();
-  const card = (cls, href, img, title, type, line, id) =>
-    '<a class="pocket filled" href="' + href + '"><span class="mtg ' + cls + '">' +
+  const lockOf = { 'grimoire/': 'grimoire', 'magiccon/': 'magiccon', 'events/': 'events' };
+  const card = (cls, href, img, title, type, line, id) => {
+    const locked = CHOIR.noAccess(lockOf[href] || '');
+    return '<a class="pocket filled' + (locked ? ' locked' : '') + '" href="' + href + '"' + (locked ? ' aria-label="' + esc(title) + ': no access"' : '') + '><span class="mtg ' + cls + '">' +
     '<span class="mtg-name">' + title + '</span>' +
     '<span class="mtg-art"><img src="' + img + '" alt=""></span>' +
     '<span class="mtg-type">' + type + '</span>' +
-    '<span class="mtg-text"' + (id ? ' id="' + id + '"' : '') + '>' + esc(line) + '</span></span></a>';
+    '<span class="mtg-text"' + (id && !locked ? ' id="' + id + '"' : '') + '>' + (locked ? '<b>No access</b>Ask the organizer' : esc(line)) + '</span></span></a>';
+  };
   const empty = '<span class="pocket" aria-hidden="true"></span>';
   const initials = (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
   root.innerHTML =
