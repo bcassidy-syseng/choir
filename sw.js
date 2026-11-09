@@ -2,12 +2,13 @@
  * App files: network first (a new version shows on the next open), with the
  * last copy kept for offline use. Commander art and fonts: cache first.
  * Calls to the Google Apps Script servers are POSTs and are never cached. */
-const APP_CACHE = 'choir-app-v13';
+const APP_CACHE = 'choir-app-v14';
 const ART_CACHE = 'choir-art-v3';
 const APP_FILES = [
   './', './index.html', './choir.js', './privacy.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/splash.png',
   './grimoire/', './grimoire/index.html', './grimoire/engine.js',
-  './magiccon/', './magiccon/index.html'
+  './magiccon/', './magiccon/index.html',
+  './events/', './events/index.html', './events/icon-192.png'
 ];
 
 self.addEventListener('install', event => {
@@ -50,7 +51,7 @@ self.addEventListener('fetch', event => {
         .catch(() => caches.match(request, { ignoreSearch: true }).then(hit => {
           if (hit) return hit;
           // Offline and never cached: open that section's page, or the front page.
-          const section = /\/(grimoire|magiccon)\//.exec(url.pathname);
+          const section = /\/(grimoire|magiccon|events)\//.exec(url.pathname);
           return caches.match(section ? './' + section[1] + '/index.html' : './index.html');
         }))
     );

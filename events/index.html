@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a130b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nexus">
+<title>Events · Nexus</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* Nexus card-back base (same tokens as the App Binder, Grimoire and MagicCon). Events' accent is the violet of the oval's rim. */
+:root {
+  --cb-frame: #1a130b; --cb-frame-2: #251b10; --cb-frame-3: #33261a;
+  --cb-line: #4d3a22; --cb-line-hi: #7a5c34;
+  --cb-parch: #f1e5cc; --cb-muted: #c4b08c;
+  --cb-gold: #dcb462; --cb-gold-hi: #f2d38e; --cb-on-gold: #2a1d05;
+  --accent: #9d95ec; --accent-hi: #c9c4fa; --on-accent: #15112e;
+  --ok: #8fcf7a; --warn: #f0c36a; --no: #f6b3a5;
+  --cb-serif: 'IM Fell English', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --cb-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --cb-mottle: radial-gradient(42% 28% at 18% 12%, rgba(130, 98, 56, .20), transparent 70%), radial-gradient(36% 24% at 84% 34%, rgba(96, 70, 38, .22), transparent 70%),
+    radial-gradient(48% 30% at 28% 66%, rgba(118, 88, 50, .16), transparent 70%), radial-gradient(34% 22% at 78% 88%, rgba(70, 50, 26, .26), transparent 70%);
+}
+html { background: var(--cb-frame); overflow-x: hidden; overflow-x: clip; }
+body { margin: 0; color: var(--cb-parch); font: 16px/1.45 var(--cb-sans); -webkit-font-smoothing: antialiased; min-height: 100vh;
+  background-color: var(--cb-frame); background-image: var(--cb-mottle); background-attachment: fixed; }
+a { color: var(--accent-hi); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+main { max-width: 640px; margin: 0 auto; padding: 0 18px calc(env(safe-area-inset-bottom, 0px) + 40px); }
+
+/* App bar: Nexus › Events, account on the right */
+.appbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; padding: calc(env(safe-area-inset-top, 0px) + 10px) 18px 10px;
+  background: rgba(20, 16, 10, .96); border-bottom: 1px solid var(--cb-line-hi); }
+.appbar .home { display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: var(--cb-parch); }
+.appbar .home img { width: 32px; height: 32px; border-radius: 8px; }
+.appbar .home span { font: 24px/1 var(--cb-serif); }
+.appbar .crumb { color: var(--cb-muted); font: 22px/1 var(--cb-serif); margin-right: auto; }
+.appbar .crumb a { color: var(--accent-hi); text-decoration: none; }
+.acct { width: 40px; height: 40px; flex: none; border-radius: 50%; border: 0; background: var(--cb-gold); color: var(--cb-on-gold); font: 700 15px/1 var(--cb-sans); cursor: pointer; }
+.acct-menu { position: absolute; right: 18px; top: calc(100% + 6px); min-width: 220px; padding: 12px 14px; border-radius: 12px; background: var(--cb-frame-2); border: 1px solid var(--cb-line-hi);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .55); display: flex; flex-direction: column; gap: 2px; }
+.acct-menu p { margin: 0 0 6px; font-size: 14px; color: var(--cb-muted); }
+.acct-menu a, .acct-menu button { display: flex; align-items: center; min-height: 40px; font-weight: 700; background: none; border: 0; padding: 0; color: var(--accent-hi); text-decoration: none; text-align: left; cursor: pointer; }
+
+h1 { font: 34px/1.1 var(--cb-serif); font-weight: 400; margin: 22px 0 6px; }
+h2 { font: 22px/1.2 var(--cb-serif); font-weight: 400; margin: 26px 0 10px; padding-left: 10px; border-left: 3px solid var(--accent); }
+.sub { color: var(--cb-muted); margin: 0 0 16px; }
+.muted { color: var(--cb-muted); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.btn { min-height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid var(--cb-line-hi); background: transparent; color: var(--cb-parch); font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.block { width: 100%; }
+.btn.danger { color: var(--no); border-color: #6b3a30; }
+.btn:disabled { opacity: .55; cursor: default; }
+.panel { background: var(--cb-frame-2); border: 1px solid var(--cb-line); border-radius: 16px; }
+.empty { padding: 26px 18px; text-align: center; color: var(--cb-muted); }
+
+/* Event cards */
+.list { display: flex; flex-direction: column; gap: 12px; padding: 0; margin: 0; list-style: none; }
+.ev { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 14px; padding: 14px; text-decoration: none; color: inherit; }
+.ev.cancelled { opacity: .62; }
+.datebox { border-radius: 12px; background: var(--cb-frame-3); border: 1px solid var(--cb-line); text-align: center; padding: 8px 0 6px; align-self: start; }
+.datebox b { display: block; font: 28px/1 var(--cb-serif); color: var(--accent-hi); }
+.datebox span { font-size: 12px; font-weight: 700; color: var(--cb-muted); text-transform: uppercase; letter-spacing: .06em; }
+.ev h3 { margin: 0 0 2px; font: 21px/1.2 var(--cb-serif); font-weight: 400; }
+.ev .meta { color: var(--cb-muted); font-size: 14px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tag { font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--cb-frame-3); border: 1px solid var(--cb-line); color: var(--cb-muted); }
+.tag.in { color: var(--ok); border-color: #3e5a33; } .tag.maybe { color: var(--warn); border-color: #6a5427; } .tag.out { color: var(--no); border-color: #6b3a30; }
+.tag.ask { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+.tag.off { color: var(--no); }
+
+/* Answer buttons */
+.answer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 14px 0; }
+.answer button { min-height: 48px; border-radius: 12px; border: 1px solid var(--cb-line-hi); background: transparent; font-weight: 700; cursor: pointer; }
+.answer button[aria-pressed="true"].in { background: #2f4a27; border-color: var(--ok); color: #dff5d6; }
+.answer button[aria-pressed="true"].maybe { background: #4d3d1c; border-color: var(--warn); color: #fbecc8; }
+.answer button[aria-pressed="true"].out { background: #4a2a24; border-color: var(--no); color: #fde0d9; }
+
+/* Event page */
+.facts { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px 10px; padding: 16px; margin: 14px 0; }
+.facts svg { width: 22px; height: 22px; color: var(--accent-hi); margin-top: 1px; }
+.facts p { margin: 0; }
+.who { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.who .panel { padding: 12px 14px; }
+.who h4 { margin: 0 0 6px; font-size: 14px; color: var(--cb-muted); }
+.who ul { margin: 0; padding: 0; list-style: none; font-size: 15px; }
+.who li { padding: 2px 0; }
+.actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+
+/* Form */
+.field { display: block; margin: 0 0 14px; }
+.field > span { display: block; font-size: 14px; color: var(--cb-muted); margin-bottom: 6px; }
+.input { width: 100%; box-sizing: border-box; min-height: 48px; padding: 10px 12px; border-radius: 12px; background: var(--cb-frame); border: 1px solid var(--cb-line); color: var(--cb-parch); }
+textarea.input { min-height: 90px; resize: vertical; }
+.input:focus { outline: none; border-color: var(--accent); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; pointer-events: none; }
+.seg span { display: flex; align-items: center; justify-content: center; min-height: 46px; border-radius: 12px; border: 1px solid var(--cb-line-hi); font-weight: 700; cursor: pointer; }
+.seg input:checked + span { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+.people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; padding: 12px 14px; max-height: 300px; overflow: auto; }
+.people label { display: flex; align-items: center; gap: 8px; min-height: 40px; }
+.people input { width: 20px; height: 20px; accent-color: var(--accent); }
+.people small { color: var(--cb-muted); }
+.err { color: var(--no); min-height: 1.4em; margin: 6px 0 10px; }
+.cal { padding: 16px; margin-top: 26px; }
+.cal p { margin: 0 0 12px; }
+#toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(12px); opacity: 0; pointer-events: none;
+  background: var(--cb-parch); color: var(--cb-frame); font-weight: 700; padding: 12px 16px; border-radius: 12px; transition: .2s; z-index: 30; max-width: 90vw; text-align: center; }
+#toast.on { opacity: 1; transform: translateX(-50%); }
+.splash { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--cb-muted); }
+.splash img { width: 120px; height: 120px; }
+@media (max-width: 480px) { .two { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 380px) { .who { grid-template-columns: 1fr; } .people { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
+</style>
+</head>
+<body>
+<div id="app"><div class="splash" role="status"><img src="../icons/splash.png" alt="" onerror="this.remove()"><p>Opening Events…</p></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="../choir.js"></script>
+<script>
+'use strict';
+/* Events talk to the Commander Grimoire script (15_Events.gs adds the requests). */
+const API_URL = 'https://script.google.com/macros/s/AKfycbxpabKYmqwDc4P_EoUyalFAiFRrZiEejKQjS3N8hUQVbkbX-j_DsUwnc7JrfCj4Zn9iCg/exec';
+const app = document.getElementById('app');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const TOKEN = () => (window.CHOIR ? CHOIR.token() : '');
+const S = { data: null, error: '', busy: false };
+try { S.data = JSON.parse(localStorage.getItem('ev_cache') || 'null'); } catch (e) { S.data = null; }
+
+if (!TOKEN()) location.replace('../');
+if (window.CHOIR) CHOIR.remember('events');
+
+/* ---------------- Server ---------------- */
+async function api(fn, args) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 45000);
+  try {
+    const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn, token: TOKEN(), args: args || {} }), signal: controller.signal, redirect: 'follow' });
+    const out = await res.json();
+    if (out && out.signedOut) { CHOIR.signOut('expired'); return out; }
+    return out;
+  } catch (e) {
+    return { ok: false, offline: true, error: 'Events couldn’t reach the server. Check your signal and try again.' };
+  } finally { clearTimeout(timer); }
+}
+function keep(data) { S.data = data; S.error = ''; try { localStorage.setItem('ev_cache', JSON.stringify(data)); } catch (e) {} }
+async function load() {
+  const out = await api('evData');
+  if (out.ok) keep(out.data);
+  else if (!S.data || !out.offline) S.error = out.error || 'Something went wrong.';
+  render();
+}
+
+/* ---------------- Helpers ---------------- */
+const ICON = {
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5a7 7 0 1 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  host: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
+  people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14c2.4.2 4 1.6 4.5 4"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3 3V20.5H6z"/><path d="M9 10h6M9 14h6M9 18h4"/></svg>'
+};
+const when = (iso, opts) => new Date(iso).toLocaleString(undefined, opts);
+const timeRange = ev => {
+  const s = new Date(ev.startsAt), e = ev.endsAt ? new Date(ev.endsAt) : null;
+  const day = when(ev.startsAt, { weekday: 'long', month: 'long', day: 'numeric' });
+  const t = d => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  if (!e) return day + ', ' + t(s);
+  return s.toDateString() === e.toDateString() ? day + ', ' + t(s) + ' – ' + t(e) : day + ', ' + t(s) + ' to ' + when(ev.endsAt, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+};
+const myAnswer = ev => { const r = ev.rsvps.find(x => x.player === S.data.me.k); return r ? r.status : ''; };
+const isHost = ev => ev.createdBy === S.data.me.k;
+const upcoming = ev => new Date(ev.endsAt || ev.startsAt).getTime() + (ev.endsAt ? 0 : 4 * 3600000) >= Date.now();
+const nameOf = k => (S.data.people.find(p => p.k === k) || {}).n || 'Someone';
+const ANSWERS = { in: 'Going', maybe: 'Maybe', out: 'Can’t go' };
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600); }
+const newId = () => 'n' + Array.from(crypto.getRandomValues(new Uint8Array(10)), b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('');
+const pad = n => String(n).padStart(2, '0');
+const localInput = iso => { const d = new Date(iso); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const gcalStamp = iso => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+function googleLink(ev) {
+  const end = ev.endsAt || new Date(new Date(ev.startsAt).getTime() + 4 * 3600000).toISOString();
+  const q = new URLSearchParams({ action: 'TEMPLATE', text: ev.title, dates: gcalStamp(ev.startsAt) + '/' + gcalStamp(end),
+    details: (ev.notes ? ev.notes + '\n\n' : '') + 'Event in Nexus: ' + location.href.split('#')[0] + '#/e/' + ev.id, location: ev.place || '' });
+  return 'https://calendar.google.com/calendar/render?' + q.toString();
+}
+function subscribeLink(url) { return 'https://calendar.google.com/calendar/render?cid=' + encodeURIComponent(url.replace(/^https:/, 'webcal:')); }
+
+/* ---------------- Views ---------------- */
+function route() { const p = location.hash.replace(/^#\/?/, '').split('/'); return { name: p[0] || 'list', arg: decodeURIComponent(p[1] || '') }; }
+
+function appBar() {
+  const me = S.data ? S.data.me : null;
+  const initials = ((me && me.n) || (window.CHOIR && CHOIR.name()) || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  return '<header class="appbar"><a class="home" href="' + esc(CHOIR.hubUrl) + '" aria-label="Nexus App Binder"><img src="../icons/icon-192.png" alt=""><span>Nexus</span></a>' +
+    '<span class="crumb" aria-hidden="true">› <a href="#/">Events</a></span>' +
+    '<button class="acct" data-act="acct" aria-haspopup="true" aria-expanded="false" aria-label="Account">' + esc(initials) + '</button>' +
+    '<div class="acct-menu" id="acctmenu" hidden><p>Signed in as <b>' + esc((me && me.n) || CHOIR.name() || 'you') + '</b></p>' +
+    '<a href="' + esc(CHOIR.hubUrl) + '">App Binder</a><a href="../privacy.html">Privacy</a><button data-act="signout">Sign out</button></div></header>';
+}
+
+function render() {
+  const r = route();
+  if (!S.data) {
+    app.innerHTML = appBar() + '<main>' + (S.error ? problem(S.error) : '<div class="splash" role="status"><img src="../icons/splash.png" alt=""><p>Opening Events…</p></div>') + '</main>';
+    return;
+  }
+  const views = { list: viewList, e: viewEvent, new: () => viewForm(null), edit: viewForm };
+  app.innerHTML = appBar() + '<main>' + (views[r.name] || viewList)(r.arg) + '</main>';
+  const form = document.getElementById('evform');
+  if (form) wireForm(form);
+}
+
+function problem(msg) {
+  const needPlayer = /player/i.test(msg);
+  return '<h1>Events</h1><div class="panel empty"><p>' + esc(msg) + '</p>' +
+    (needPlayer ? '<a class="btn primary" href="../grimoire/">Pick your player in Grimoire</a>' : '<button class="btn" data-act="retry">Try again</button>') + '</div>';
+}
+
+function card(ev) {
+  const d = new Date(ev.startsAt), a = myAnswer(ev);
+  const tags = [];
+  if (ev.status === 'cancelled') tags.push('<span class="tag off">Cancelled</span>');
+  else if (isHost(ev)) tags.push('<span class="tag in">You’re hosting</span>');
+  else if (a) tags.push('<span class="tag ' + a + '">' + ANSWERS[a] + '</span>');
+  else if (upcoming(ev)) tags.push('<span class="tag ask">Answer needed</span>');
+  tags.push('<span class="tag">' + (ev.kind === 'game_night' ? 'Game night' : 'Event') + '</span>');
+  if (ev.invite !== 'all') tags.push('<span class="tag">Invite only</span>');
+  const going = ev.rsvps.filter(x => x.status === 'in').length;
+  return '<li><a class="panel ev' + (ev.status === 'cancelled' ? ' cancelled' : '') + '" href="#/e/' + esc(ev.id) + '">' +
+    '<div class="datebox"><b>' + d.getDate() + '</b><span>' + esc(d.toLocaleDateString(undefined, { month: 'short' })) + '</span></div>' +
+    '<div><h3>' + esc(ev.title) + '</h3><div class="meta">' + esc(when(ev.startsAt, { weekday: 'short', hour: 'numeric', minute: '2-digit' })) +
+    ' · ' + esc(isHost(ev) ? 'Hosted by you' : 'Hosted by ' + ev.createdByName) + ' · ' + going + ' going</div><div class="tags">' + tags.join('') + '</div></div></a></li>';
+}
+
+function viewList() {
+  const evs = S.data.events.slice().sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+  const next = evs.filter(upcoming), past = evs.filter(e => !upcoming(e)).reverse();
+  let h = '<div class="row"><h1>Events</h1><a class="btn primary" href="#/new">New event</a></div>' +
+    '<p class="sub">Game nights and anything else the group is planning.</p>' +
+    (S.error ? '<p class="err" role="alert">' + esc(S.error) + '</p>' : '');
+  h += next.length ? '<ul class="list">' + next.map(card).join('') + '</ul>'
+    : '<div class="panel empty"><p>Nothing planned yet.</p><a class="btn primary" href="#/new">Plan a game night</a></div>';
+  if (S.data.feedUrl) {
+    h += '<section class="panel cal"><h2 style="margin-top:0">Your calendar</h2>' +
+      '<p class="muted">Subscribe once and every event you’re invited to shows up in Google Calendar, kept up to date. Google checks for changes every few hours.</p>' +
+      '<div class="actions"><a class="btn primary" href="' + esc(subscribeLink(S.data.feedUrl)) + '" target="_blank" rel="noopener">Subscribe in Google Calendar</a>' +
+      '<button class="btn" data-act="copyfeed">Copy calendar address</button></div>' +
+      '<p class="muted" style="font-size:14px;margin:12px 0 0">The address is private to you. Anyone who has it can see your events.</p></section>';
+  }
+  if (past.length) h += '<h2>Earlier</h2><ul class="list">' + past.slice(0, 10).map(card).join('') + '</ul>';
+  return h;
+}
+
+function viewEvent(id) {
+  const ev = S.data.events.find(e => e.id === id);
+  if (!ev) return '<h1>Events</h1><div class="panel empty"><p>That event isn’t here. It may be invite-only, or it was removed.</p><a class="btn" href="#/">All events</a></div>';
+  const a = myAnswer(ev), host = isHost(ev), off = ev.status === 'cancelled', live = upcoming(ev) && !off;
+  const list = st => ev.rsvps.filter(r => r.status === st).map(r => '<li>' + esc(r.name) + (r.player === ev.createdBy ? ' <small class="muted">host</small>' : '') + '</li>').join('') || '<li class="muted">Nobody yet</li>';
+  const invited = ev.invite === 'all' ? 'Everyone in the group' : ev.invite.map(nameOf).join(', ');
+  const waiting = ev.invite === 'all' ? [] : ev.invite.filter(k => !ev.rsvps.some(r => r.player === k));
+  let h = '<p style="margin:16px 0 0"><a href="#/">‹ All events</a></p><h1>' + esc(ev.title) + '</h1>' +
+    '<p class="sub">' + (off ? '<b style="color:var(--no)">Cancelled.</b> ' : '') + (ev.kind === 'game_night' ? 'Game night' : 'Event') + (ev.invite !== 'all' ? ' · invite only' : '') + '</p>';
+  if (live && !host) {
+    h += '<div class="answer" role="group" aria-label="Your answer">' + ['in', 'maybe', 'out'].map(s =>
+      '<button class="' + s + '" data-act="rsvp" data-v="' + s + '" aria-pressed="' + (a === s) + '">' + ANSWERS[s] + '</button>').join('') + '</div>';
+  }
+  h += '<div class="panel facts">' + ICON.clock + '<p>' + esc(timeRange(ev)) + '</p>' +
+    ICON.pin + '<p>' + (ev.place ? esc(ev.place) : ev.placeHidden ? '<span class="muted">The address shows once you answer Going or Maybe.</span>' : '<span class="muted">Place to be decided</span>') + '</p>' +
+    ICON.host + '<p>' + esc(host ? 'You’re hosting' : 'Hosted by ' + ev.createdByName) + (ev.host ? ' at ' + esc(ev.host) + '’s' : '') + '</p>' +
+    ICON.people + '<p>' + esc(invited) + (ev.kind === 'game_night' ? ' · ' + ev.seats + ' seats' : '') + '</p>' +
+    (ev.notes ? ICON.note + '<p style="white-space:pre-line">' + esc(ev.notes) + '</p>' : '') + '</div>';
+  h += '<div class="who"><div class="panel"><h4>Going</h4><ul>' + list('in') + '</ul></div><div class="panel"><h4>Maybe</h4><ul>' + list('maybe') + '</ul></div>' +
+    '<div class="panel"><h4>Can’t go</h4><ul>' + list('out') + '</ul></div>' +
+    (waiting.length ? '<div class="panel"><h4>Haven’t answered</h4><ul>' + waiting.map(k => '<li>' + esc(nameOf(k)) + '</li>').join('') + '</ul></div>' : '') + '</div>';
+  h += '<div class="actions">';
+  if (!off) h += '<a class="btn primary" href="' + esc(googleLink(ev)) + '" target="_blank" rel="noopener">Add to Google Calendar</a>';
+  if (!off && ev.kind === 'game_night') h += '<a class="btn" href="../grimoire/#/night/' + esc(ev.id) + '">Pods and results in Grimoire</a>';
+  if (host && live) h += '<a class="btn" href="#/edit/' + esc(ev.id) + '">Edit event</a><button class="btn danger" data-act="cancel" data-id="' + esc(ev.id) + '">Cancel event</button>';
+  h += '</div>';
+  return h;
+}
+
+function viewForm(id) {
+  const ev = id ? S.data.events.find(e => e.id === id) : null;
+  if (id && (!ev || !isHost(ev))) return '<h1>Edit event</h1><div class="panel empty"><p>Only the host can change this event.</p><a class="btn" href="#/">All events</a></div>';
+  const start = ev ? new Date(ev.startsAt) : (() => { const d = new Date(); d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7 || 7)); d.setHours(18, 30, 0, 0); return d; })();
+  const end = ev && ev.endsAt ? new Date(ev.endsAt) : new Date(start.getTime() + 4 * 3600000);
+  const kind = ev ? ev.kind : 'game_night', everyone = !ev || ev.invite === 'all';
+  const chosen = ev && ev.invite !== 'all' ? ev.invite : [];
+  const people = S.data.people.filter(p => p.k !== S.data.me.k);
+  return '<p style="margin:16px 0 0"><a href="' + (ev ? '#/e/' + esc(ev.id) : '#/') + '">‹ Back</a></p><h1>' + (ev ? 'Edit event' : 'New event') + '</h1>' +
+    '<form id="evform" novalidate><input type="hidden" name="eid" value="' + esc(ev ? ev.id : newId()) + '">' +
+    '<div class="seg" role="radiogroup" aria-label="Kind of event"><label><input type="radio" name="kind" value="game_night"' + (kind === 'game_night' ? ' checked' : '') + '><span>Game night</span></label>' +
+    '<label><input type="radio" name="kind" value="event"' + (kind === 'event' ? ' checked' : '') + '><span>Other event</span></label></div>' +
+    '<label class="field"><span>Name</span><input class="input" name="title" maxlength="60" value="' + esc(ev ? ev.title : '') + '" placeholder="Commander night"></label>' +
+    '<div class="two"><label class="field"><span>Starts</span><input class="input" type="datetime-local" name="start" required value="' + localInput(start) + '"></label>' +
+    '<label class="field"><span>Ends</span><input class="input" type="datetime-local" name="end" value="' + localInput(end) + '"></label></div>' +
+    '<label class="field"><span>Where</span><input class="input" name="place" maxlength="120" value="' + esc(ev ? ev.place : '') + '" placeholder="Address or game store"></label>' +
+    '<label class="field" data-gn><span>Seats</span><input class="input" type="number" name="seats" min="2" max="60" value="' + (ev ? ev.seats : 8) + '"></label>' +
+    '<label class="field"><span>Notes</span><textarea class="input" name="notes" maxlength="300" placeholder="Bring a deck, snacks, parking…">' + esc(ev ? ev.notes : '') + '</textarea></label>' +
+    '<span class="field" style="margin-bottom:8px"><span>Who’s invited</span></span>' +
+    '<div class="seg" role="radiogroup" aria-label="Who is invited"><label><input type="radio" name="who" value="all"' + (everyone ? ' checked' : '') + '><span>Everyone</span></label>' +
+    '<label><input type="radio" name="who" value="some"' + (everyone ? '' : ' checked') + '><span>Choose people</span></label></div>' +
+    '<fieldset class="panel people" id="people"' + (everyone ? ' hidden' : '') + '><legend class="muted" style="font-size:14px;padding:0 4px">Invite</legend>' +
+    people.map(p => '<label><input type="checkbox" name="invite" value="' + esc(p.k) + '"' + (chosen.includes(p.k) ? ' checked' : '') + '>' + esc(p.n) + (p.linked ? '' : ' <small>(no Discord)</small>') + '</label>').join('') + '</fieldset>' +
+    '<p class="err" id="formerr" role="alert"></p>' +
+    '<button class="btn primary block" type="submit">' + (ev ? 'Save changes' : 'Create and invite') + '</button></form>';
+}
+
+function wireForm(form) {
+  const f = n => form.elements[n];
+  const sync = () => {
+    form.querySelector('#people').hidden = f('who').value !== 'some';
+    form.querySelector('[data-gn]').hidden = f('kind').value !== 'game_night';
+  };
+  form.addEventListener('change', e => {
+    if (e.target.name === 'start' && f('start').value) {
+      const s = new Date(f('start').value), en = new Date(f('end').value);
+      if (!f('end').value || en <= s) f('end').value = localInput(new Date(s.getTime() + 4 * 3600000));
+    }
+    sync();
+  });
+  sync();
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = form.querySelector('#formerr'), btn = form.querySelector('button[type="submit"]');
+    if (!f('start').value) { err.textContent = 'Choose when it starts.'; return; }
+    const invite = f('who').value === 'all' ? 'all' : Array.from(form.querySelectorAll('input[name="invite"]:checked')).map(i => i.value);
+    if (invite !== 'all' && !invite.length) { err.textContent = 'Invite at least one person, or choose Everyone.'; return; }
+    const event = { id: f('eid').value, kind: f('kind').value, title: f('title').value, startsAt: new Date(f('start').value).toISOString(),
+      endsAt: f('end').value ? new Date(f('end').value).toISOString() : '', place: f('place').value, notes: f('notes').value, seats: Number(f('seats').value) || 8, invite };
+    btn.disabled = true; btn.textContent = 'Saving…'; err.textContent = '';
+    const out = await api('evSave', { event });
+    if (!out.ok) { btn.disabled = false; btn.textContent = 'Try again'; err.textContent = out.error; return; }
+    keep(out.data); toast(route().name === 'new' ? 'Event created. Invites are on their way.' : 'Changes saved. Everyone invited will hear about it.');
+    location.hash = '#/e/' + event.id;
+  });
+}
+
+/* ---------------- Actions ---------------- */
+const actions = {
+  acct: el => { const m = document.getElementById('acctmenu'); m.hidden = !m.hidden; el.setAttribute('aria-expanded', String(!m.hidden)); },
+  signout: () => CHOIR.signOut(),
+  retry: () => { S.error = ''; render(); load(); },
+  rsvp: async el => {
+    const id = route().arg, ev = S.data.events.find(e => e.id === id);
+    const status = myAnswer(ev) === el.dataset.v ? '' : el.dataset.v;
+    el.parentNode.querySelectorAll('button').forEach(b => { b.disabled = true; });
+    const out = await api('evRsvp', { id, status });
+    if (out.ok) { keep(out.data); toast(status ? 'You answered ' + ANSWERS[status] + '.' : 'Answer cleared.'); } else toast(out.error);
+    render();
+  },
+  cancel: async el => {
+    if (el.dataset.confirm !== '1') { el.dataset.confirm = '1'; el.textContent = 'Tap again to cancel for everyone'; return; }
+    el.disabled = true;
+    const out = await api('evCancel', { id: el.dataset.id });
+    if (out.ok) { keep(out.data); toast('Event cancelled. Everyone invited will hear about it.'); } else toast(out.error);
+    render();
+  },
+  copyfeed: async el => {
+    try { await navigator.clipboard.writeText(S.data.feedUrl); el.textContent = 'Copied'; }
+    catch (e) { prompt('Copy your calendar address:', S.data.feedUrl); }
+  }
+};
+document.addEventListener('click', e => {
+  const menu = document.getElementById('acctmenu');
+  if (menu && !menu.hidden && !e.target.closest('#acctmenu, [data-act="acct"]')) menu.hidden = true;
+  const el = e.target.closest('[data-act]');
+  if (!el || !actions[el.dataset.act]) return;
+  e.preventDefault();
+  actions[el.dataset.act](el);
+});
+window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
+
+render();
+load();
+if (window.CHOIR && CHOIR.backdrop) CHOIR.backdrop(app);
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(() => {});
+</script>
+</body>
+</html>

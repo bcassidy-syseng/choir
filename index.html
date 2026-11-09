@@ -110,6 +110,7 @@ code { font: 700 15px/1 var(--cb-sans); background: var(--cb-frame-3); border: 1
 .mtg { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 6px; background: #120d07; box-shadow: inset 0 0 0 3px var(--frame); }
 .mtg.gm { --frame: #b98f3e; --frame-hi: #f2d38e; }
 .mtg.mc { --frame: #2f7fc4; --frame-hi: #86ccff; }
+.mtg.ev { --frame: #7d74d8; --frame-hi: #c9c4fa; }
 .mtg-name, .mtg-type { display: block; padding: 4px 6px; border-radius: 4px; background: linear-gradient(180deg, #f1e5cc, #d9c7a2); color: #1a130b; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mtg-name { font: 17px/1.1 var(--cb-serif); }
 .mtg-type { font: 700 11px/1.2 var(--cb-sans); }
@@ -206,6 +207,16 @@ async function redeem(code, button) {
   }
 }
 
+/* The Events card shows what's next, from the copy the Events page keeps. */
+function nextEvent() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem('ev_cache') || 'null'); } catch (e) { d = null; }
+  const next = d && d.events ? d.events.filter(e => e.status !== 'cancelled' && new Date(e.startsAt).getTime() > Date.now())
+    .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0] : null;
+  if (!next) return 'Invite the group to a game night';
+  return 'Next: ' + new Date(next.startsAt).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + next.title;
+}
+
 function hubView(message) {
   const days = Math.ceil((CON_DAY - Date.now()) / 86400000);
   const con = days > 1 ? days + ' days to go' : days >= -2 ? 'This weekend' : 'Feb 26–28';
@@ -230,7 +241,8 @@ function hubView(message) {
     '<nav class="pockets" aria-label="Nexus sections">' +
     card('gm', 'grimoire/', 'grimoire/icons/icon-192.png', 'Grimoire', 'Commander', 'Battles, standings and game nights', 'gm-ticker') +
     card('mc', 'magiccon/', 'magiccon/icon-192.png', 'MagicCon', 'Detroit trip', 'Feb 26–28 · ' + con) +
-    empty + empty +
+    card('ev', 'events/', 'events/icon-192.png', 'Events', 'Game nights & plans', nextEvent()) +
+    empty +
     '</nav></div></div>';
   const acct = document.getElementById('acct'), menu = document.getElementById('acctmenu');
   acct.onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; acct.setAttribute('aria-expanded', String(!menu.hidden)); };
@@ -274,7 +286,7 @@ function ticker(el) {
   if (!CHOIR.token()) { signInView(); return; }
   // Opening the app goes straight back to the section used last; ?switch shows the choice.
   const last = CHOIR.last();
-  if (!/[?&]switch\b/.test(location.search) && (last === 'grimoire' || last === 'magiccon')) { location.replace(last + '/'); return; }
+  if (!/[?&]switch\b/.test(location.search) && (last === 'grimoire' || last === 'magiccon' || last === 'events')) { location.replace(last + '/'); return; }
   hubView();
 })();
 
