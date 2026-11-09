@@ -116,6 +116,11 @@ code { font: 700 15px/1 var(--cb-sans); background: var(--cb-frame-3); border: 1
 .mtg-art { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; border-radius: 3px; background: #000; box-shadow: inset 0 0 0 1px var(--frame-hi); overflow: hidden; }
 .mtg-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mtg-text { display: block; padding: 4px 6px; min-height: 2.6em; font: 12px/1.3 var(--cb-sans); color: #1a130b; background: #efe4cc; border-radius: 3px; }
+.mtg-text b { display: block; font-weight: 700; }
+.mtg-text { flex: none; box-sizing: content-box; min-height: 3.9em; max-height: 3.9em; overflow: hidden; }
+#gm-ticker { transition: opacity .25s ease; }
+#gm-ticker.fade { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { #gm-ticker { transition: none; } }
 .pocket.filled:active .mtg { transform: translateY(-2px); }
 .foot { font-size: 14px; margin: 18px 0 0; }
 .foot .link-btn { font-weight: 700; min-height: 44px; }
@@ -205,12 +210,12 @@ function hubView(message) {
   const days = Math.ceil((CON_DAY - Date.now()) / 86400000);
   const con = days > 1 ? days + ' days to go' : days >= -2 ? 'This weekend' : 'Feb 26–28';
   const name = CHOIR.name();
-  const card = (cls, href, img, title, type, line) =>
+  const card = (cls, href, img, title, type, line, id) =>
     '<a class="pocket filled" href="' + href + '"><span class="mtg ' + cls + '">' +
     '<span class="mtg-name">' + title + '</span>' +
     '<span class="mtg-art"><img src="' + img + '" alt=""></span>' +
     '<span class="mtg-type">' + type + '</span>' +
-    '<span class="mtg-text">' + esc(line) + '</span></span></a>';
+    '<span class="mtg-text"' + (id ? ' id="' + id + '"' : '') + '>' + esc(line) + '</span></span></a>';
   const empty = '<span class="pocket" aria-hidden="true"></span>';
   const initials = (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
   root.innerHTML =
@@ -223,7 +228,7 @@ function hubView(message) {
     '<div class="rings" aria-hidden="true"><i></i><i></i><i></i></div>' +
     '<div class="sheet">' +
     '<nav class="pockets" aria-label="Nexus sections">' +
-    card('gm', 'grimoire/', 'grimoire/icons/icon-192.png', 'Grimoire', 'Commander', 'Battles, standings and game nights') +
+    card('gm', 'grimoire/', 'grimoire/icons/icon-192.png', 'Grimoire', 'Commander', 'Battles, standings and game nights', 'gm-ticker') +
     card('mc', 'magiccon/', 'magiccon/icon-192.png', 'MagicCon', 'Detroit trip', 'Feb 26–28 · ' + con) +
     empty + empty +
     '</nav></div></div>';
@@ -231,6 +236,24 @@ function hubView(message) {
   acct.onclick = e => { e.stopPropagation(); menu.hidden = !menu.hidden; acct.setAttribute('aria-expanded', String(!menu.hidden)); };
   document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target)) { menu.hidden = true; acct.setAttribute('aria-expanded', 'false'); } });
   document.getElementById('signout').onclick = () => CHOIR.signOut();
+  ticker(document.getElementById('gm-ticker'));
+}
+
+/* The Grimoire card's text cycles through headline stats saved by Grimoire. */
+let tickerTimer = 0;
+function ticker(el) {
+  clearInterval(tickerTimer);
+  let lines = [];
+  try { lines = JSON.parse(localStorage.getItem('cg_summary') || '[]'); } catch (e) { lines = []; }
+  if (!el || !lines.length) return;
+  let i = 0;
+  const show = () => {
+    const l = lines[i % lines.length]; i++;
+    el.classList.add('fade');
+    setTimeout(() => { el.innerHTML = '<b>' + esc(l.t) + '</b>' + esc(l.x); el.classList.remove('fade'); }, el.textContent ? 250 : 0);
+  };
+  show();
+  if (lines.length > 1) tickerTimer = setInterval(show, 3600);
 }
 
 (function start() {

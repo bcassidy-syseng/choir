@@ -851,6 +851,7 @@ function render() {
   lastView = r.name;
   root.innerHTML = topBar() + '<main id="view">' + offlineNote() + view(r.arg, firstHome) + '</main>' + tabs(tab);
   fillCredits();
+  saveSummary();
 }
 
 function topBar() {
@@ -1192,6 +1193,30 @@ function goPlayer(dir) {
     if (e.key === 'ArrowLeft') goPlayer('prev'); else if (e.key === 'ArrowRight') goPlayer('next');
   });
 })();
+
+/* A few headline numbers for the Grimoire card on the Nexus home page,
+   which cycles through them. Short and small, so it always fits in storage. */
+let lastSummary = '';
+function saveSummary() {
+  if (DEMO || !S.data) return;
+  try {
+    const st = stats(), lines = [];
+    const short = s => s.length > 26 ? s.slice(0, 25).trim() + '…' : s;
+    const lead = st.standings[0];
+    if (lead) lines.push({ t: 'Standings', x: short(player(lead.index).n) + ' leads with ' + plural(lead.wins, 'win') });
+    const mi = meIndex(), me = mi >= 0 ? st.standings.find(s => s.index === mi) : null;
+    if (me) lines.push({ t: 'Your rank', x: ordinal(me.rank) + ' of ' + st.standings.length + ' players' });
+    const last = st.games.slice().sort((a, b) => (b.t || 0) - (a.t || 0))[0];
+    const win = last && last.pod.find(s => s[2]);
+    if (last && win) lines.push({ t: 'Last battle', x: fmtDay(last.d, { month: 'short', day: 'numeric' }) + ', won by ' + short(player(win[0]).n) });
+    const top = st.deckList[0];
+    if (top) lines.push({ t: 'Top deck', x: short(deck(top.index).n) + ', ' + plural(top.wins, 'win') });
+    const next = upcomingNights()[0];
+    lines.push({ t: 'Game nights', x: next ? 'Next: ' + new Date(next.startsAt).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : 'None planned yet' });
+    const json = JSON.stringify(lines);
+    if (json !== lastSummary) { lastSummary = json; store.set('summary', lines); }
+  } catch (e) { /* the card falls back to its plain description */ }
+}
 
 function viewPlayer(key) {
   const pi = playerIndex(key);
