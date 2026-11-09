@@ -27,10 +27,14 @@
    * bottom of the screen only where the page leaves room. A different card each
    * visit, credited to its artist (from Scryfall's card data). */
   function artPool() {
-    let data = null;
-    try { data = JSON.parse(localStorage.getItem('cg_data') || 'null'); } catch (e) { data = null; }
+    let decks = [];
+    try {
+      const art = JSON.parse(localStorage.getItem('cg_art') || 'null');
+      if (art && art.length) decks = art.map(x => ({ art: x.a, art2: x.b, cmd: x.c }));
+      else decks = (JSON.parse(localStorage.getItem('cg_data') || 'null') || {}).decks || [];
+    } catch (e) { decks = []; }
     const out = [], seen = {};
-    ((data && data.decks) || []).forEach(d => {
+    decks.forEach(d => {
       [[d.art, (d.cmd || [])[0]], [d.art2, (d.cmd || [])[1]]].forEach(([direct, name]) => {
         const url = direct || (name ? 'https://api.scryfall.com/cards/named?exact=' + encodeURIComponent(name) + '&format=image&version=art_crop' : '');
         if (url && !seen[url]) { seen[url] = 1; out.push({ url: url, name: name || '' }); }
@@ -94,7 +98,8 @@
       const top = el.getBoundingClientRect().top + window.scrollY;
       const pad = parseFloat(getComputedStyle(content).paddingBottom) || 0;
       const gap = window.innerHeight - barH - top - Math.max(0, pad - barH);
-      el.style.height = Math.round(Math.min(window.innerHeight * 0.8, Math.max(300, gap))) + 'px';
+      const vh = window.innerHeight > 200 ? window.innerHeight : 800;
+      el.style.height = Math.round(Math.min(vh * 0.8, Math.max(300, gap))) + 'px';
       busy = false;
     }
     let queued = false;

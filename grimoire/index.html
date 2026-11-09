@@ -556,6 +556,13 @@ function art(deckIdx, extraClass, opts) {
   return '<div class="art ' + (extraClass || '') + (second ? ' split' : '') + '" style="' + artStyle(d.ci) + '">' + mark + img(first) + img(second) + credit + '</div>';
 }
 
+/* A short list of commander art, kept for Choir's other pages (card art in empty space). */
+function saveArt(ds) {
+  if (DEMO || !ds || !ds.decks) return;
+  store.set('art', ds.decks.map(d => ({ a: d.art || '', b: d.art2 || '', c: (d.cmd || []).slice(0, 2) })).filter(x => x.a || x.b || x.c.length));
+}
+if (S && S.data) saveArt(S.data);
+
 /* Artist credit for commander art. The art is cropped from Scryfall images, which
    cuts off the printed artist line, so the artist is named on the large images.
    Names come from Scryfall's card data, one request at a time, and are kept. */
@@ -657,7 +664,7 @@ async function refresh(quiet) {
     const key = out.data.you.player || '';
     if (key !== S.me) { S.me = key; if (key) store.set('me', key); else store.del('me'); }
   }
-  if (out.data.dataset) { S.data = out.data.dataset; store.set('data', S.data); STATS_KEY = ''; }
+  if (out.data.dataset) { S.data = out.data.dataset; store.set('data', S.data); saveArt(S.data); saveArt(S.data); STATS_KEY = ''; }
   applyLive(out.data.live);
   S.syncedAt = Date.now(); store.set('syncedAt', S.syncedAt); store.set('server', S.server);
   render();
@@ -1452,7 +1459,7 @@ document.addEventListener('submit', async e => {
     const out = await api('appData', { me: S.me });
     if (out.ok) {
       store.set('pass', S.pass);
-      S.data = out.data.dataset; store.set('data', S.data);
+      S.data = out.data.dataset; store.set('data', S.data); saveArt(S.data);
       S.server = out.build || ''; store.set('server', S.server);
       applyLive(out.data.live);
       S.syncedAt = Date.now(); store.set('syncedAt', S.syncedAt);
