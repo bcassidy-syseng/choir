@@ -136,7 +136,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 'use strict';
 /* Events has its own spreadsheet and Apps Script (github.com/bcassidy-syseng/event-scheduler).
    Paste its Web app address (ending in /exec) here. */
-const API_URL = '';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzRxrwszrFzKXxiGEg58Y8numLLLX-YUAfTI-H2_SPOT9K-u_AxTKl0C9X6GzVJ0Y8A/exec';
 const app = document.getElementById('app');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TOKEN = () => (window.CHOIR ? CHOIR.token() : '');
