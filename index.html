@@ -64,7 +64,7 @@ a { color: var(--cb-gold-hi); }
 button, input { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--cb-gold-hi); outline-offset: 2px; border-radius: 6px; }
 main { max-width: 440px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 28px) 18px calc(env(safe-area-inset-bottom, 0px) + 32px); }
-.mark { font: 120px/0.8 var(--cb-serif); color: var(--cb-gold-hi); text-shadow: 0 3px 0 rgba(0, 0, 0, .55), 0 0 1px #000; margin-bottom: 6px; }
+.mark { width: 104px; height: 104px; display: block; margin: 0 auto 8px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
 h2 { font: 24px/1.2 var(--cb-serif); font-weight: 400; margin: 0 0 10px; padding-left: 10px; border-left: 3px solid var(--cb-copper); }
 p { margin: 0 0 12px; }
 .muted { color: var(--cb-muted); }
@@ -118,7 +118,7 @@ const root = document.getElementById('root');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function cardBack(title, line) {
-  return '<div class="cb-back"><div class="cb-oval"><div class="mark" aria-hidden="true">C</div><h1>' + esc(title) + '</h1><p>' + esc(line) + '</p></div></div>';
+  return '<div class="cb-back"><div class="cb-oval"><img class="mark" src="icons/icon-192.png" alt=""><h1>' + esc(title) + '</h1><p>' + esc(line) + '</p></div></div>';
 }
 
 function signInView(message) {
