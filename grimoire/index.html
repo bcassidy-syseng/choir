@@ -75,6 +75,7 @@ body {
 * { box-sizing: border-box; }
 html, body { margin: 0; color: var(--vellum); }
 html { background: var(--ink); }
+html { overflow-x: hidden; overflow-x: clip; } /* nothing may push the page sideways (swipes, slide-in, wide art) */
 body {
   font: 16px/1.45 var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -323,7 +324,7 @@ textarea.input { min-height: 96px; resize: vertical; }
 .mana-filter button[aria-pressed="true"] { border-color: var(--gilt); }
 
 /* Detail pages */
-.detail-hero { position: relative; margin: 0 -16px; min-height: 300px; display: flex; align-items: flex-end; }
+.detail-hero { position: relative; margin: 0 -16px; min-height: 300px; display: flex; align-items: flex-end; overflow: hidden; }
 .detail-hero .art { position: absolute; inset: 0; }
 .detail-hero .art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(26, 19, 11, .05), rgba(26, 19, 11, .4) 45%, var(--ink) 97%); }
 .detail-hero .hero-body { position: relative; padding: 0 16px 4px; width: 100%; }

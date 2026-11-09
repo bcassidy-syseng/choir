@@ -64,7 +64,7 @@
       done(name);
     });
   }
-  const STYLE = '.choir-bd{position:relative;display:block;width:100vw;margin:8px 0 0 calc(50% - 50vw);overflow:hidden;pointer-events:none;' +
+  const STYLE = 'html{overflow-x:hidden;overflow-x:clip}.choir-bd{position:relative;display:block;width:100vw;margin:8px 0 0 calc(50% - 50vw);overflow:hidden;pointer-events:none;' +
     '-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 34%);mask-image:linear-gradient(180deg,transparent 0,#000 34%)}' +
     '.choir-bd img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;max-width:none;opacity:0;transition:opacity .6s ease}' +
     '.choir-bd img.on{opacity:1}' +
