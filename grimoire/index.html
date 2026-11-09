@@ -1305,8 +1305,8 @@ function nightCard(n) {
 function viewNights() {
   const upcoming = upcomingNights();
   const past = S.live.nights.filter(n => !upcoming.includes(n)).sort((a, b) => new Date(b.startsAt) - new Date(a.startsAt));
-  let html = '<h1 class="page-title">Game nights</h1><p class="page-sub">Say whether you’re in, and the pods build themselves.</p>' +
-    (S.me ? '<button class="btn primary block" data-act="new-night">Plan a game night</button>' : '');
+  let html = '<h1 class="page-title">Game nights</h1><p class="page-sub">New game nights are planned in Events, where you can invite everyone or just a few people and add them to your calendar.</p>' +
+    '<a class="btn primary block" href="../events/#/new">Plan a game night in Events</a><div style="height:10px"></div><a class="btn block" href="../events/">Open Events</a>';
   html += '<section class="section"><h2>Coming up</h2>' + (upcoming.length ? upcoming.map(n => nightCard(n)).join('<div style="height:12px"></div>') : '<div class="panel empty">Nothing planned yet.</div>') + '</section>';
   if (past.length) {
     html += '<section class="section"><h2>Earlier</h2><ul class="panel list">' + past.map(n =>
@@ -1461,7 +1461,8 @@ const actions = {
     const status = myRsvp(el.dataset.night) === el.dataset.v ? '' : el.dataset.v;
     send('appRsvp', { me: S.me, nightId: el.dataset.night, status }, status === 'in' ? 'You’re in.' : status === 'maybe' ? 'Marked as maybe.' : status === 'out' ? 'Marked as can’t go.' : 'Answer cleared.');
   },
-  'new-night': () => { if (!S.me) { toast('Pick your name first.'); return; } openSheet(nightForm(null)); },
+  // Game nights are planned in Nexus Events now; nights made here before keep working below.
+  'new-night': () => { location.href = '../events/#/new'; },
   'edit-night': el => openSheet(nightForm(S.live.nights.find(n => n.id === el.dataset.night))),
   'cancel-night': el => { if (confirmInline(el, 'Tap again to cancel this night')) send('appCancelNight', { me: S.me, nightId: el.dataset.night }, 'Game night cancelled.'); },
   'pod-size': el => { S.ui.podSize = +el.dataset.v; saveUi(); render(); },

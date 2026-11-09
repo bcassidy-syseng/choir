@@ -134,8 +134,9 @@ textarea.input { min-height: 90px; resize: vertical; }
 <script src="../choir.js"></script>
 <script>
 'use strict';
-/* Events talk to the Commander Grimoire script (15_Events.gs adds the requests). */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxpabKYmqwDc4P_EoUyalFAiFRrZiEejKQjS3N8hUQVbkbX-j_DsUwnc7JrfCj4Zn9iCg/exec';
+/* Events has its own spreadsheet and Apps Script (github.com/bcassidy-syseng/event-scheduler).
+   Paste its Web app address (ending in /exec) here. */
+const API_URL = '';
 const app = document.getElementById('app');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TOKEN = () => (window.CHOIR ? CHOIR.token() : '');
@@ -147,6 +148,7 @@ if (window.CHOIR) CHOIR.remember('events');
 
 /* ---------------- Server ---------------- */
 async function api(fn, args) {
+  if (!API_URL) return { ok: false, error: 'Events isn’t connected to its spreadsheet yet. Your organizer is setting it up.' };
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 45000);
   try {
@@ -227,9 +229,7 @@ function render() {
 }
 
 function problem(msg) {
-  const needPlayer = /player/i.test(msg);
-  return '<h1>Events</h1><div class="panel empty"><p>' + esc(msg) + '</p>' +
-    (needPlayer ? '<a class="btn primary" href="../grimoire/">Pick your player in Grimoire</a>' : '<button class="btn" data-act="retry">Try again</button>') + '</div>';
+  return '<h1>Events</h1><div class="panel empty"><p>' + esc(msg) + '</p><button class="btn" data-act="retry">Try again</button></div>';
 }
 
 function card(ev) {
@@ -290,7 +290,6 @@ function viewEvent(id) {
     (waiting.length ? '<div class="panel"><h4>Haven’t answered</h4><ul>' + waiting.map(k => '<li>' + esc(nameOf(k)) + '</li>').join('') + '</ul></div>' : '') + '</div>';
   h += '<div class="actions">';
   if (!off) h += '<a class="btn primary" href="' + esc(googleLink(ev)) + '" target="_blank" rel="noopener">Add to Google Calendar</a>';
-  if (!off && ev.kind === 'game_night') h += '<a class="btn" href="../grimoire/#/night/' + esc(ev.id) + '">Pods and results in Grimoire</a>';
   if (host && live) h += '<a class="btn" href="#/edit/' + esc(ev.id) + '">Edit event</a><button class="btn danger" data-act="cancel" data-id="' + esc(ev.id) + '">Cancel event</button>';
   h += '</div>';
   return h;
@@ -318,7 +317,9 @@ function viewForm(id) {
     '<div class="seg" role="radiogroup" aria-label="Who is invited"><label><input type="radio" name="who" value="all"' + (everyone ? ' checked' : '') + '><span>Everyone</span></label>' +
     '<label><input type="radio" name="who" value="some"' + (everyone ? '' : ' checked') + '><span>Choose people</span></label></div>' +
     '<fieldset class="panel people" id="people"' + (everyone ? ' hidden' : '') + '><legend class="muted" style="font-size:14px;padding:0 4px">Invite</legend>' +
-    people.map(p => '<label><input type="checkbox" name="invite" value="' + esc(p.k) + '"' + (chosen.includes(p.k) ? ' checked' : '') + '>' + esc(p.n) + (p.linked ? '' : ' <small>(no Discord)</small>') + '</label>').join('') + '</fieldset>' +
+    (people.length ? '' : '<p class="muted" style="grid-column:1/-1;margin:0">Nobody else has opened Events yet.</p>') +
+    people.map(p => '<label><input type="checkbox" name="invite" value="' + esc(p.k) + '"' + (chosen.includes(p.k) ? ' checked' : '') + '>' + esc(p.n) + '</label>').join('') + '</fieldset>' +
+    '<p class="muted" style="font-size:14px;margin:-4px 0 12px">People show up here once they’ve opened Events. Everyone includes anyone who opens it later.</p>' +
     '<p class="err" id="formerr" role="alert"></p>' +
     '<button class="btn primary block" type="submit">' + (ev ? 'Save changes' : 'Create and invite') + '</button></form>';
 }
