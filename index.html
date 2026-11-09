@@ -201,6 +201,7 @@ function hubView(message) {
   hubView();
 })();
 
+if (window.CHOIR && CHOIR.backdrop) CHOIR.backdrop(root);
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>

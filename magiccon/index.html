@@ -1494,6 +1494,7 @@ function drawShare(logo){
 /* boot */
 (function(){ const c = cachedData(); if (c && c.sessions && S.pass !== undefined) { S.data = c; render(); } })();
 api('apiData', [], () => flushOut(), m => { if (m.indexOf('WRONG_PASSCODE')>=0) renderPass(); else if (!S.data) $('#app').innerHTML = '<div class="center"><div class="empty">⚠ '+esc(m)+'</div></div>'; });
+if (window.CHOIR && CHOIR.backdrop && !viaScript()) CHOIR.backdrop(document.getElementById('app'), '.nav');
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !viaScript() && !/googleusercontent|google\.com$/.test(location.hostname)) navigator.serviceWorker.register(window.CHOIR ? '../sw.js' : 'sw.js', window.CHOIR ? {scope: '../'} : undefined).catch(() => {});
 </script>
 </body>

@@ -1484,6 +1484,7 @@ if ('serviceWorker' in navigator && !DEMO && location.protocol === 'https:') {
 render();
 if (authed()) { refresh(true).then(() => flush()); }
 setInterval(() => { if (document.visibilityState === 'visible' && authed()) refresh(true); }, 5 * 60000);
+if (window.CHOIR && CHOIR.backdrop && !DEMO) CHOIR.backdrop(document.getElementById('root'), '.tabs');
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && authed() && Date.now() - S.syncedAt > 60000) refresh(true); });
 </script>
 </body>
